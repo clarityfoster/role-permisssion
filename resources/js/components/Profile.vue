@@ -1,15 +1,12 @@
 <template>
     <div>
-        <Sidebar/>
+        <h2>Welcome to Profile Page!</h2>
     </div>
 </template>
 
 <script>
-    import Sidebar from './components/Sidebar.vue';
     export default {
-        components: {
-            Sidebar,
-        }
+        name: "Profile",
     }
 </script>
 

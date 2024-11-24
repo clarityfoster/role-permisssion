@@ -1,15 +1,12 @@
 <template>
     <div>
-        <Sidebar/>
+        <h3>Welcome to Manage Role Page!</h3>
     </div>
 </template>
 
 <script>
-    import Sidebar from './components/Sidebar.vue';
     export default {
-        components: {
-            Sidebar,
-        }
+
     }
 </script>
 

@@ -1,56 +1,116 @@
 <template>
-<div class="container mt-5" style="max-width: 1200px;">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-                <div v-if="successRegistration" class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ successRegistration }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="container mt-5" style="max-width: 1200px">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div
+                    v-if="loginSuccess"
+                    class="alert alert-success alert-dismissible fade show"
+                    role="alert"
+                >
+                    {{ loginSuccess }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"
+                    ></button>
                 </div>
-            <div class="card">
-                <div class="card-header">Login</div>
-                <div class="card-body">
-                    <form method="POST" action="">
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">Email</label>
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" required autocomplete="email" autofocus>
+                <div class="card">
+                    <div class="card-header">Login</div>
+                    <div class="card-body">
+                        <form @submit.prevent="login">
+                            <div class="row mb-3">
+                                <label
+                                    for="email"
+                                    class="col-md-4 col-form-label text-md-end"
+                                    >Email</label
+                                >
+                                <div class="col-md-6">
+                                    <input
+                                        id="email"
+                                        v-model="email"
+                                        type="email"
+                                        class="form-control"
+                                        name="email"
+                                        required
+                                        autocomplete="email"
+                                        autofocus
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">Password</label>
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control " name="password" required autocomlete="current-password">
+                            <div class="row mb-3">
+                                <label
+                                    for="password"
+                                    class="col-md-4 col-form-label text-md-end"
+                                    >Password</label
+                                >
+                                <div class="col-md-6">
+                                    <input
+                                        id="password"
+                                        v-model="password"
+                                        type="password"
+                                        class="form-control"
+                                        name="password"
+                                        required
+                                        autocomplete="current-password"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Login
-                                </button>
-                                <a class="btn btn-link" href="">
-                                    Forget your password
-                                </a>
+                            <div class="row mb-0">
+                                <div class="col-md-8 offset-md-4">
+                                    <button class="btn btn-primary">
+                                        Login
+                                    </button>
+
+                                    <router-link to="/register" class="text-secondary ms-2">
+                                        Sign Up
+                                    </router-link>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
-    export default {
-        name: 'Login',
-        data() {
-            return {
-                successRegistration: $this.$route.query.success || '',
+import api from "../api/axios.js";
+export default {
+    name: "Login",
+    data() {
+        return {
+            email: "",
+            password: "",
+            loginSuccess: "",
+            loginFail: "",
+            auth_user: "",
+            successRegistration: this.$route.query.successRegister || "",
+        };
+    },
+    methods: {
+        async login() {
+            try {
+                const { data } = await api.post("/login", {
+                    email: this.email,
+                    password: this.password,
+                });
+                if (data.success) {
+                    localStorage.setItem("token", data.token);
+                    this.userlogin = true;
+                    this.loginSuccess = "Login successful!";
+                    this.loginFail = "";
+                }
+                this.$router.push("/dashboard");
+            } catch (error) {
+                this.loginFail =
+                    error.response?.data?.message || "Login failed!";
+                this.successMessage = "";
             }
-        }
-    }
+        },
+    },
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
 
 class AuthController extends Controller
@@ -32,13 +33,27 @@ class AuthController extends Controller
         ]);
     }
     public function login() {
-        $users = new User();
-        $users->name = request()->name;
-        $users->password = request()->password;
-        $users->save();
+        $check = request()->only('email', 'password');
+        if (auth()->attempt($check)) {
+            $user = auth()->user();
+            if ($user) {
+                $token = $user->createToken('YourAppName')->plainTextToken;
+                return response()->json([
+                    'user' => $user,
+                    'success' => true,
+                    'token' => $token,
+                    'login-success' => 'Login Successful!'
+                ], 200);
+            }
+        }
+
         return response()->json([
-            'user' => $user,
-            
-        ]);
+            'success' => false,
+            'login-fail' => 'Invalid email or password.',
+        ], 401);
+    }
+    public function logout() {
+        Auth::logout();
+        return response()->json(['message' => 'Logged out successfully'], 200);
     }
 }
