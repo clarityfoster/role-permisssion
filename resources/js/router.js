@@ -6,6 +6,7 @@ import HomeComponent from './components/Home.vue';
 import ProfileComponent from './components/Profile.vue';
 import ManageRoleComponent from './components/ManageRole.vue';
 import AddUserComponent from './components/AddUser.vue';
+import EditUserComponent from './components/EditUser.vue';
 
 const routes = [
     {
@@ -43,6 +44,12 @@ const routes = [
         name: 'addUser',
         component: AddUserComponent
     },
+    {
+        path: '/editUser/:id',
+        name: 'editUser',
+        component: EditUserComponent,
+    },
+
 ];
 const router = createRouter({
     history: createWebHistory(), // Use history mode for clean URLs

@@ -17,6 +17,14 @@
                     <small v-if="auth_user">{{ auth_user.email }}</small>
                 </div>
             </div>
+
+            <div
+                    v-if="userDeleteAlert"
+                    class="alert alert-danger w-50"
+                    role="alert"
+                >
+                    {{ userDeleteAlert }}
+                </div>
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h3>Users List</h3>
                 <router-link class="btn btn-primary" to="/addUser">
@@ -88,8 +96,8 @@
                                     </ul>
                                 </button>
                                 <button
-                                    type="button"
-                                    class="btn btn-outline-info"
+                                    @click="editUser(user.id)"
+                                    class="btn btn-outline-primary"
                                 >
                                     Edit
                                 </button>
@@ -97,20 +105,20 @@
                         </td>
                         <td class="text-muted">
                             <button
-                                    type="button"
-                                    class="btn btn-outline-warning"
-                                >
-                                    Suspended
-                                </button>
+                                type="button"
+                                class="btn btn-outline-warning"
+                            >
+                                Suspended
+                            </button>
                         </td>
                         <td class="text-muted">
                             <button
-                                    type="button"
-                                    class="btn btn-danger"
-                                    @click="deleteUser(user.id)"
-                                >
-                                    Delete
-                                </button>
+                                type="button"
+                                class="btn btn-danger"
+                                @click="deleteUser(user.id)"
+                            >
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -135,6 +143,7 @@ export default {
                 4: "bg-info",
                 5: "bg-warning",
             },
+            userDeleteAlert: "",
         };
     },
     mounted() {
@@ -154,14 +163,17 @@ export default {
         },
         async changeUserRole(userId, roleId) {
             try {
-                const {data} = await api.post(`/users/${userId}/change-role`,
+                const { data } = await api.post(
+                    `/users/${userId}/change-role`,
                     {
                         role_id: roleId,
                     }
                 );
                 const updatedUser = data.user;
 
-                const index = this.users.findIndex((user) => user.id === userId);
+                const index = this.users.findIndex(
+                    (user) => user.id === userId
+                );
                 if (index !== -1) {
                     this.users[index] = updatedUser;
                 }
@@ -173,13 +185,19 @@ export default {
         async deleteUser(userId) {
             try {
                 await api.post(`/users/${userId}/delete`);
-                this.users = this.users.filter(function(user) {
-                    return user.id !== userId;
-                })
+                this.users = this.users.filter((user) => user.id !== userId);
+
+                this.userDeleteAlert = "User successfully deleted.";
+                setTimeout(() => {
+                    this.userDeleteAlert = "";
+                }, 3000);
             } catch (error) {
                 console.error("Error deleting user:", error);
                 alert("Failed to delete user.");
             }
+        },
+        editUser(userId) {
+            this.$router.push({ name: "editUser", params: { id: userId } });
         },
         getBadgeClass(role_id) {
             return this.roleColorMapping[role_id] || "bg-secondary";

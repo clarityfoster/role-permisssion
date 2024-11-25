@@ -64,4 +64,8 @@ class DashboardController extends Controller
             'addUser' => 'User added successfully!',
         ]);
     }
+    public function edit($id) {
+        $user = User::findOrFail($id);
+        
+    }
 }

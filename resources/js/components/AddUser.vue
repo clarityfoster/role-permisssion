@@ -84,6 +84,7 @@ export default {
             };
             try {
                 await api.post('/users/add', userData);
+                this.$router.push('/dashboard')
             } catch (error) {
                 this.failAddUser = "Failed to create user. Try again!";
                 console.error("Error fetching roles:", error);
