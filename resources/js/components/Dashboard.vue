@@ -1,7 +1,7 @@
 <template>
     <div>
         <main class="p-4">
-            <div class="d-flex justify-content-between align-items-center mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="input-group w-50">
                     <input
                         type="text"
@@ -19,10 +19,10 @@
             </div>
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h3>Users List</h3>
-                <button class="btn btn-primary">
+                <router-link class="btn btn-primary" to="/addUser">
                     <i class="bi bi-plus-lg me-1"></i>
                     Add User
-                </button>
+                </router-link>
             </div>
             <table class="table custom-table table-hover align-middle shadow">
                 <thead class="table-light">
@@ -31,8 +31,8 @@
                         <th class="text-muted fw-normal">User Name</th>
                         <th class="text-muted fw-normal">Email</th>
                         <th class="text-muted fw-normal">Role</th>
-                        <th class="text-muted fw-normal">Change Role</th>
-                        <th class="text-muted fw-normal">Suspended</th>
+                        <th class="text-muted fw-normal">Actions</th>
+                        <th class="text-muted fw-normal">Suspened</th>
                         <th class="text-muted fw-normal">Delete</th>
                     </tr>
                 </thead>
@@ -42,39 +42,75 @@
                         <td class="text-dark fw-semibold">{{ user.name }}</td>
                         <td class="text-muted">{{ user.email }}</td>
                         <td class="text-muted">
-                            <span :class="getBadgeClass(user.role.id)" class="badge">
+                            <span
+                                :class="getBadgeClass(user.role.id)"
+                                class="badge"
+                            >
                                 {{ user.role.role }}
                             </span>
                         </td>
-                        <td class="dropdown">
-                            <a
-                                class="btn btn-outline-secondary dropdown-toggle"
-                                href="#"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
+                        <td class="text-muted">
+                            <div
+                                class="btn-group"
+                                role="group"
+                                aria-label="Basic outlined example"
                             >
-                                Change Role
-                            </a>
-
-                            <ul class="dropdown-menu">
-                                <li v-for="role in roles" :key="role.id">
-                                    <a class="dropdown-item" href="#">
-                                        {{ role.role }}
-                                    </a>
-                                </li>
-                            </ul>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary dropdown"
+                                >
+                                    <div
+                                        class="dropdown-toggle text-decoration-none"
+                                        href="#"
+                                        role="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        Change Role
+                                    </div>
+                                    <ul class="dropdown-menu">
+                                        <li
+                                            v-for="role in roles"
+                                            :key="role.id"
+                                        >
+                                            <button
+                                                class="dropdown-item"
+                                                @click="
+                                                    changeUserRole(
+                                                        user.id,
+                                                        role.id
+                                                    )
+                                                "
+                                            >
+                                                {{ role.role }}
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-info"
+                                >
+                                    Edit
+                                </button>
+                            </div>
                         </td>
-
                         <td class="text-muted">
-                            <button class="btn btn-outline-warning btn-sm">
-                                Suspended
-                            </button>
+                            <button
+                                    type="button"
+                                    class="btn btn-outline-warning"
+                                >
+                                    Suspended
+                                </button>
                         </td>
                         <td class="text-muted">
-                            <button class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash3-fill"></i>
-                            </button>
+                            <button
+                                    type="button"
+                                    class="btn btn-danger"
+                                    @click="deleteUser(user.id)"
+                                >
+                                    Delete
+                                </button>
                         </td>
                     </tr>
                 </tbody>
@@ -93,11 +129,11 @@ export default {
             users: [],
             roles: [],
             roleColorMapping: {
-                1: 'bg-secondary',
-                2: 'bg-success',
-                3: 'bg-primary',
-                4: 'bg-info',
-                5: 'bg-warning',
+                1: "bg-secondary",
+                2: "bg-success",
+                3: "bg-primary",
+                4: "bg-info",
+                5: "bg-warning",
             },
         };
     },
@@ -116,8 +152,37 @@ export default {
                 console.error("Error fetching user data:", error);
             }
         },
+        async changeUserRole(userId, roleId) {
+            try {
+                const {data} = await api.post(`/users/${userId}/change-role`,
+                    {
+                        role_id: roleId,
+                    }
+                );
+                const updatedUser = data.user;
+
+                const index = this.users.findIndex((user) => user.id === userId);
+                if (index !== -1) {
+                    this.users[index] = updatedUser;
+                }
+            } catch (error) {
+                console.error("Error updating user role:", error);
+                alert("Failed to update user role.");
+            }
+        },
+        async deleteUser(userId) {
+            try {
+                await api.post(`/users/${userId}/delete`);
+                this.users = this.users.filter(function(user) {
+                    return user.id !== userId;
+                })
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                alert("Failed to delete user.");
+            }
+        },
         getBadgeClass(role_id) {
-            return this.roleColorMapping[role_id] || 'bg-secondary';
+            return this.roleColorMapping[role_id] || "bg-secondary";
         },
     },
 };
@@ -125,7 +190,7 @@ export default {
 
 <style lang="scss" scoped>
 .table {
-    border-radius: 25px;
+    border-radius: 15px;
     overflow: hidden;
     width: 100%;
 }

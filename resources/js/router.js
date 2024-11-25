@@ -5,6 +5,7 @@ import DashboardComponent from './components/Dashboard.vue';
 import HomeComponent from './components/Home.vue';
 import ProfileComponent from './components/Profile.vue';
 import ManageRoleComponent from './components/ManageRole.vue';
+import AddUserComponent from './components/AddUser.vue';
 
 const routes = [
     {
@@ -36,6 +37,11 @@ const routes = [
         path: '/manageRole',
         name: 'manageRole',
         component: ManageRoleComponent
+    },
+    {
+        path: '/addUser',
+        name: 'addUser',
+        component: AddUserComponent
     },
 ];
 const router = createRouter({

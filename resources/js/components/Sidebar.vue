@@ -2,24 +2,26 @@
     <div class="page-wrapper">
         <nav class="sidebar">
             <div class="d-flex align-items-center justify-content-center mb-4">
-                <h2>RoleX</h2>
+                <router-link to="/dashboard" class="h2 text-decoration-none text-dark">
+                    RoleX
+                </router-link>
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
                     <router-link
                         class="nav-link"
                         :class="{ disabled: !userlogin }"
-                        :to="userlogin ? '/dashboard' : '#'"
+                        to="/dashboard"
                         active-class="active"
                         ><i class="bi bi-house-door me-2"></i>
-                        Dashboard</router-link
-                    >
+                        Dashboard
+                    </router-link>
                 </li>
                 <li class="nav-item mb-2">
                     <router-link
                         class="nav-link"
                         :class="{ disabled: !userlogin }"
-                        :to="userlogin ? '/manageRole' : '#'"
+                        to="/manageRole"
                         active-class="active">
                             <i class="bi bi-bar-chart me-2"></i> Manage Role
                         </router-link>
@@ -28,7 +30,7 @@
                     <router-link
                         class="nav-link"
                         :class="{ disabled: !userlogin }"
-                        :to="userlogin ? '/profile' : '#'"
+                        to="/profile"
                         active-class="active"
                         ><i class="bi bi-person me-2"></i> Profile</router-link
                     >
@@ -105,8 +107,8 @@ export default {
     }
 
     .sidebar .nav-link.disabled {
-        pointer-events: none; /* Disable click events */
-        opacity: 0.6; /* Make it visually clear it's disabled */
+        pointer-events: none;
+        opacity: 0.6;
         color: gray;
     }
 

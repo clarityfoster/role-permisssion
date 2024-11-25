@@ -25,6 +25,14 @@ class DatabaseSeeder extends Seeder
             "name" => "John",
             "email" => "john@gmail.com",
         ]);
+        \App\Models\User::factory()->create([
+            "name" => "Elle",
+            "email" => "elle@gmail.com",
+        ]);
+        \App\Models\User::factory()->create([
+            "name" => "Oliver",
+            "email" => "oliver@gmail.com",
+        ]);
         $roles = ['User', 'Manager', 'Admin'];
         foreach ($roles as $role) {
             \App\Models\Role::factory()->create([
