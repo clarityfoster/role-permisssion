@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,9 +13,11 @@ class DashboardController extends Controller
     public function dashboard() {
         $users = User::with('role')->get();
         $roles = Role::all();
+        $permissions = Permission::all();
         $authUser = Auth::user();
         return response()->json([
             'auth_user' => $authUser,
+            'permissions' => $permissions,
             'roles' => $roles,
             'users' => $users,
         ]);
@@ -56,6 +59,8 @@ class DashboardController extends Controller
         $user = new User();
         $user->name = request()->name;
         $user->email = request()->email;
+        $user->phone = request()->phone;
+        $user->address = request()->address;
         $user->role_id = request()->role_id;
         $user->password = request()->password;
         $user->save();
@@ -66,6 +71,26 @@ class DashboardController extends Controller
     }
     public function edit($id) {
         $user = User::findOrFail($id);
-        
+        return response()->json([
+        'user' => $user,
+      ]);
+    }
+    public function view($id) {
+        $user = User::findOrFail($id);
+        return response()->json([
+        'user' => $user,
+      ]);
+    }
+    public function update($id) {
+        $user = User::findOrFail($id);
+        $user->name = request()->name;
+        $user->email = request()->email;
+        $user->phone = request()->phone;
+        $user->address = request()->address;
+        $user->role_id = request()->role_id;
+        $user->save();
+        return response()->json([
+        'user' => $user,
+      ]);
     }
 }

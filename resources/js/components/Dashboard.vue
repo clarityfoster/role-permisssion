@@ -17,27 +17,28 @@
                     <small v-if="auth_user">{{ auth_user.email }}</small>
                 </div>
             </div>
-
             <div
-                    v-if="userDeleteAlert"
-                    class="alert alert-danger w-50"
-                    role="alert"
-                >
-                    {{ userDeleteAlert }}
-                </div>
+                v-if="userDeleteAlert"
+                class="alert alert-danger w-50"
+                role="alert"
+            >
+                {{ userDeleteAlert }}
+            </div>
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h3>Users List</h3>
-                <router-link class="btn btn-primary" to="/addUser">
+                <router-link class="btn btn-primary" to="/users/add">
                     <i class="bi bi-plus-lg me-1"></i>
                     Add User
                 </router-link>
             </div>
-            <table class="table custom-table table-hover align-middle shadow">
+            <table class="table custom-table align-middle shadow">
                 <thead class="table-light">
                     <tr>
                         <th class="text-muted fw-normal">Id</th>
                         <th class="text-muted fw-normal">User Name</th>
                         <th class="text-muted fw-normal">Email</th>
+                        <th class="text-muted fw-normal">Phone</th>
+                        <th class="text-muted fw-normal">Address</th>
                         <th class="text-muted fw-normal">Role</th>
                         <th class="text-muted fw-normal">Actions</th>
                         <th class="text-muted fw-normal">Suspened</th>
@@ -49,6 +50,8 @@
                         <td class="text-dark fw-normal">{{ user.id }}</td>
                         <td class="text-dark fw-semibold">{{ user.name }}</td>
                         <td class="text-muted">{{ user.email }}</td>
+                        <td class="text-muted">{{ user.phone }}</td>
+                        <td class="text-muted">{{ user.address }}</td>
                         <td class="text-muted">
                             <span
                                 :class="getBadgeClass(user.role.id)"
@@ -65,7 +68,7 @@
                             >
                                 <button
                                     type="button"
-                                    class="btn btn-outline-secondary dropdown"
+                                    class="btn btn-outline-info dropdown"
                                 >
                                     <div
                                         class="dropdown-toggle text-decoration-none"
@@ -97,9 +100,15 @@
                                 </button>
                                 <button
                                     @click="editUser(user.id)"
-                                    class="btn btn-outline-primary"
+                                    class="btn btn-outline-secondary"
                                 >
                                     Edit
+                                </button>
+                                <button
+                                    @click="view(user.id)"
+                                    class="btn btn-outline-primary"
+                                >
+                                    View
                                 </button>
                             </div>
                         </td>
@@ -152,7 +161,7 @@ export default {
     methods: {
         async fetchUser() {
             try {
-                const { data } = await api.get("/dashboard");
+                const { data } = await api.get("/users");
                 this.auth_user = data.auth_user;
                 this.users = data.users;
                 this.roles = data.roles;
@@ -196,8 +205,11 @@ export default {
                 alert("Failed to delete user.");
             }
         },
-        editUser(userId) {
-            this.$router.push({ name: "editUser", params: { id: userId } });
+        editUser(id) {
+            this.$router.push({ name: "editUser", params: { id: id } });
+        },
+        view(id) {
+            this.$router.push({ name: "view", params: { id: id } });
         },
         getBadgeClass(role_id) {
             return this.roleColorMapping[role_id] || "bg-secondary";
