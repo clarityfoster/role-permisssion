@@ -41,7 +41,7 @@
                         <th class="text-muted fw-normal">Address</th>
                         <th class="text-muted fw-normal">Role</th>
                         <th class="text-muted fw-normal">Actions</th>
-                        <th class="text-muted fw-normal">Suspened</th>
+                        <th class="text-muted fw-normal">Status</th>
                         <th class="text-muted fw-normal">Delete</th>
                     </tr>
                 </thead>
@@ -114,10 +114,20 @@
                         </td>
                         <td class="text-muted">
                             <button
+                                v-if="user.suspended"
+                                type="button"
+                                class="btn btn-warning text-white"
+                                @click="unsuspendUser(user.id)"
+                            >
+                                Unsuspend
+                            </button>
+                            <button
+                                v-else
                                 type="button"
                                 class="btn btn-outline-warning"
+                                @click="suspendUser(user.id)"
                             >
-                                Suspended
+                                Suspend
                             </button>
                         </td>
                         <td class="text-muted">
@@ -159,62 +169,74 @@ export default {
         this.fetchUser();
     },
     methods: {
-        async fetchUser() {
-            try {
-                const { data } = await api.get("/users");
-                this.auth_user = data.auth_user;
-                this.users = data.users;
-                this.roles = data.roles;
-                console.log(data);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        },
-        async changeUserRole(userId, roleId) {
-            try {
-                const { data } = await api.post(
-                    `/users/${userId}/change-role`,
-                    {
-                        role_id: roleId,
-                    }
-                );
-                const updatedUser = data.user;
-
-                const index = this.users.findIndex(
-                    (user) => user.id === userId
-                );
-                if (index !== -1) {
-                    this.users[index] = updatedUser;
-                }
-            } catch (error) {
-                console.error("Error updating user role:", error);
-                alert("Failed to update user role.");
-            }
-        },
-        async deleteUser(userId) {
-            try {
-                await api.post(`/users/${userId}/delete`);
-                this.users = this.users.filter((user) => user.id !== userId);
-
-                this.userDeleteAlert = "User successfully deleted.";
-                setTimeout(() => {
-                    this.userDeleteAlert = "";
-                }, 3000);
-            } catch (error) {
-                console.error("Error deleting user:", error);
-                alert("Failed to delete user.");
-            }
-        },
-        editUser(id) {
-            this.$router.push({ name: "editUser", params: { id: id } });
-        },
-        view(id) {
-            this.$router.push({ name: "view", params: { id: id } });
-        },
-        getBadgeClass(role_id) {
-            return this.roleColorMapping[role_id] || "bg-secondary";
-        },
+    async fetchUser() {
+        try {
+            const { data } = await api.get("/users");
+            this.auth_user = data.auth_user;
+            this.users = data.users;
+            this.roles = data.roles;
+            console.log(data);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
     },
+    async changeUserRole(userId, roleId) {
+        try {
+            const { data } = await api.post(`/users/${userId}/change-role`, { role_id: roleId });
+            const updatedUser = data.user;
+            const index = this.users.findIndex(user => user.id === userId);
+            if (index !== -1) {
+                this.users[index] = updatedUser;
+            }
+        } catch (error) {
+            console.error("Error updating user role:", error);
+        }
+    },
+    async deleteUser(userId) {
+        try {
+            await api.post(`/users/${userId}/delete`);
+            this.users = this.users.filter(user => user.id !== userId);
+            this.userDeleteAlert = "User successfully deleted.";
+            setTimeout(() => {
+                this.userDeleteAlert = "";
+            }, 3000);
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
+    },
+    async suspendUser(userId) {
+        try {
+            const { data } = await api.post(`/users/${userId}/suspend`);
+            const user = this.users.find(u => u.id == userId);
+            if (user) {
+                user.suspended = true;
+            }
+        } catch (error) {
+            console.error("Error suspending user:", error);
+        }
+    },
+    async unsuspendUser(userId) {
+        try {
+            const { data } = await api.post(`/users/${userId}/unsuspend`);
+            const user = this.users.find(u => u.id == userId);
+            if (user) {
+                user.suspended = false;
+            }
+        } catch (error) {
+            console.error("Error unsuspending user:", error);
+        }
+    },
+    editUser(id) {
+        this.$router.push({ name: "editUser", params: { id } });
+    },
+    view(id) {
+        this.$router.push({ name: "view", params: { id } });
+    },
+    getBadgeClass(role_id) {
+        return this.roleColorMapping[role_id] || "bg-secondary";
+    }
+}
+
 };
 </script>
 
@@ -235,25 +257,6 @@ export default {
     border-bottom: 1px solid #dee2e6;
 }
 
-.table td:nth-child(1),
-.table th:nth-child(1) {
-    padding-left: 20px;
-    padding-top: 20px;
-}
-
-.table td:nth-child(2),
-.table th:nth-child(2) {
-    padding-left: 25px;
-}
-.table td:nth-child(7),
-.table th:nth-child(7) {
-    padding-right: 20px;
-}
-
-.table thead {
-    background-color: #f8f9fa;
-}
-
 .table-hover tbody tr:hover {
     background-color: #f1f1f1;
 }
@@ -262,8 +265,6 @@ export default {
     padding: 6px 12px;
     font-size: 13px;
     border-radius: 12px;
-    display: inline-block;
-    text-align: center;
     font-weight: 600;
     color: white;
 }

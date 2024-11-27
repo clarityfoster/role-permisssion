@@ -93,4 +93,22 @@ class DashboardController extends Controller
         'user' => $user,
       ]);
     }
+    public function suspended($id) {
+        $user = User::findOrFail($id);
+        $user->suspended = true;
+        $user->save();
+        return response()->json([
+            'user' => $user,
+            'suspended' => 'User suspended!'
+        ]);
+    }
+    public function unsuspended($id) {
+        $user = User::findOrFail($id);
+        $user->suspended = false;
+        $user->save();
+        return response()->json([
+            'user' => $user,
+            'unsuspended' => 'User unsuspended!'
+        ]);
+    }
 }

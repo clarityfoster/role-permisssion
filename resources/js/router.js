@@ -8,7 +8,6 @@ import ManageRoleComponent from './components/ManageRole.vue';
 import AddUserComponent from './components/AddUser.vue';
 import EditUserComponent from './components/EditUser.vue';
 import ViewUserComponent from './components/View.vue';
-import AddRoleComponent from './components/AddRole.vue';
 
 const routes = [
     {
@@ -58,12 +57,6 @@ const routes = [
         component: ViewUserComponent,
         props: true,
     },
-    {
-        path: '/roles/add',
-        name: 'addRole',
-        component: AddRoleComponent,
-    },
-
 ];
 const router = createRouter({
     history: createWebHistory(), // Use history mode for clean URLs

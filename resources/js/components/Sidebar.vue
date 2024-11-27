@@ -10,7 +10,6 @@
                 <li class="nav-item mb-2">
                     <router-link
                         class="nav-link"
-                        :class="{ disabled: !userlogin }"
                         to="/dashboard"
                         active-class="active"
                         ><i class="bi bi-house-door me-2"></i>
@@ -20,7 +19,6 @@
                 <li class="nav-item mb-2">
                     <router-link
                         class="nav-link"
-                        :class="{ disabled: !userlogin }"
                         to="/manageRole"
                         active-class="active">
                             <i class="bi bi-bar-chart me-2"></i> Manage Role
@@ -29,7 +27,6 @@
                 <li class="nav-item mb-2">
                     <router-link
                         class="nav-link"
-                        :class="{ disabled: !userlogin }"
                         to="/profile"
                         active-class="active"
                         ><i class="bi bi-person me-2"></i> Profile</router-link

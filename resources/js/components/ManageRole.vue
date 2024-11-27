@@ -1,131 +1,150 @@
 <template>
     <main
         class="d-flex flex-column gap-5 align-items-center justify-content-center p-4 mt-5"
-        style="max-width: 1500px"
     >
-        <div class="table-responsive shadow rounded-3 bg-white p-4 w-75">
-            <table class="table align-middle">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="fw-semibold text-muted">Role Name</th>
-                        <th class="text-center fw-semibold text-muted">Create</th>
-                        <th class="text-center fw-semibold text-muted">View</th>
-                        <th class="text-center fw-semibold text-muted">Update</th>
-                        <th class="text-center fw-semibold text-muted">Suspended</th>
-                        <th class="text-center fw-semibold text-muted">Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="role in roles" :key="role.id" class="hover-row">
-                        <td class="text-dark fw-bold">{{ role.role }}</td>
-                        <td class="text-center">
-                            <input
-                                type="checkbox"
-                                class="form-check-input form-check-primary"
-                            />
-                        </td>
-                        <td class="text-center">
-                            <input
-                                type="checkbox"
-                                class="form-check-input form-check-primary"
-                            />
-                        </td>
-                        <td class="text-center">
-                            <input
-                                type="checkbox"
-                                class="form-check-input form-check-primary"
-                            />
-                        </td>
-                        <td class="text-center">
-                            <input
-                                type="checkbox"
-                                class="form-check-input form-check-primary"
-                            />
-                        </td>
-                        <td class="text-center">
-                            <input
-                                type="checkbox"
-                                class="form-check-input form-check-primary"
-                            />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div
+            class="d-flex flex-column align-items-start w-75 justify-content-center"
+        >
+            <div
+                v-if="overnaming"
+                class="alert alert-warning w-75"
+                role="alert"
+            >
+                {{ overnaming }}
+            </div>
+            <form @submit.prevent="addRole">
+                <div class="d-flex gap-2 mb-3">
+                    <input
+                        v-model="role"
+                        type="text"
+                        class="form-control py-2 px-4 rounded-2"
+                        name="role"
+                        placeholder="Enter new role name"
+                    />
+                    <button class="btn btn-primary rounded-2">Submit</button>
+                </div>
+            </form>
+            <div class="table-responsive shadow rounded-3 bg-white p-4 w-75">
+                <table class="table align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="fw-semibold text-muted">Role Name</th>
+                            <th
+                                v-for="permission in permissions"
+                                :key="permission.id"
+                                class="text-start fw-semibold text-muted"
+                            >
+                                {{ permission.permissions }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="role in roles" :key="role.id">
+                            <td>{{ role.role }}</td>
+                            <td
+                                v-for="permission in permissions"
+                                :key="permission.id"
+                            >
+                                <input
+                                    class="form-check-input form-check-primary"
+                                    type="checkbox"
+                                    :checked="
+                                        role.permissions.some(
+                                            (p) => p.id === permission.id
+                                        )
+                                    "
+                                    @change="
+                                        updateRolePermission(
+                                            role.id,
+                                            permission.id,
+                                            $event.target.checked
+                                        )
+                                    "
+                                />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <router-link class="btn btn-primary" to="/roles/add">
-            <i class="bi bi-plus-lg me-1"></i>
-            Add New Role
-        </router-link>
     </main>
 </template>
 
 <script>
 import api from "../api/axios.js";
 export default {
+    name: "manageRole",
     data() {
         return {
+            permissions: [],
             roles: [],
-            roleColorMapping: {
-                1: "bg-secondary",
-                2: "bg-success",
-                3: "bg-primary",
-                4: "bg-info",
-                5: "bg-warning",
-            },
+            role: "",
+            overnaming: "",
         };
     },
     mounted() {
-        this.fetchRoles();
+        this.fetchPermissionsAndRoles();
     },
     methods: {
-        async fetchRoles() {
+        async addRole() {
             try {
-                const { data } = await api.get("/users");
-                this.roles = data.roles;
+                await api.post("/roles/add", {
+                    role: this.role,
+                });
+                this.role = "";
+                await this.fetchPermissionsAndRoles();
             } catch (error) {
-                console.error("Error fetching roles:", error);
-                alert("Failed to load roles.");
+                this.overnaming = 'Something went wrong. Check role name again to avoid overnaming!';
+                setTimeout(() => {
+                    this.overnaming = "";
+                }, 5000);
+                this.role = "";
+            }
+        },
+        async fetchPermissionsAndRoles() {
+            try {
+                const { data } = await api.get("/permissions-and-roles");
+                this.roles = data.roles;
+                this.permissions = data.permissions;
+            } catch (error) {
+                console.error("Error fetching roles and permissions:", error);
+                alert("Failed to load roles and permissions.");
+            }
+        },
+        async updateRolePermission(roleId, permissionId, isChecked) {
+            try {
+                const role = this.roles.find((r) => r.id === roleId);
+
+                let updatedPermissions = role.permissions.map((p) => p.id);
+                if (isChecked) {
+                    updatedPermissions.push(permissionId);
+                } else {
+                    updatedPermissions = updatedPermissions.filter(
+                        (id) => id !== permissionId
+                    );
+                }
+
+                // Send update request to the server
+                await api.post(`/roles/${roleId}/permissions`, {
+                    permissions: updatedPermissions,
+                });
+
+                // Update the local role object
+                this.roles = this.roles.map((r) =>
+                    r.id === roleId
+                        ? {
+                              ...r,
+                              permissions: this.permissions.filter((p) =>
+                                  updatedPermissions.includes(p.id)
+                              ),
+                          }
+                        : r
+                );
+            } catch (error) {
+                console.error("Error updating role permission:", error);
+                alert("Failed to update role permissions.");
             }
         },
     },
 };
 </script>
-<style lang="scss" scoped>
-.table {
-    font-size: 15px;
-    border-collapse: collapse;
-    width: 100%;
-    color: #333;
-}
-
-.table thead {
-    background-color: #f8f9fa;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.table tbody tr {
-    background-color: white;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.table tbody tr:not(:last-child) td {
-    border-bottom: 1px solid #dee2e6; /* Adds a line below every td except for the last row */
-}
-
-.table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-.table td,
-.table th {
-    text-align: center;
-    padding: 0.75rem;
-}
-
-.table td:first-child,
-.table th:first-child {
-    text-align: left;
-    padding-left: 1.5rem;
-}
-</style>
