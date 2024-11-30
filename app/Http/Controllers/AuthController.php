@@ -52,8 +52,10 @@ class AuthController extends Controller
             'login-fail' => 'Invalid email or password.',
         ], 401);
     }
-    public function logout() {
-        Auth::logout();
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully'], 200);
     }
 }

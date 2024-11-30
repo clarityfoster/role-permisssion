@@ -80,36 +80,52 @@ import api from "../api/axios.js";
 export default {
     name: "Login",
     data() {
-        return {
-            email: "",
-            password: "",
-            loginSuccess: "",
-            loginFail: "",
-            auth_user: "",
-            successRegistration: this.$route.query.successRegister || "",
-        };
+    return {
+        email: "",
+        password: "",
+        loginSuccess: "",
+        loginFail: "",
+        auth_user: JSON.parse(localStorage.getItem('user')) || null, // Initialize with existing user from localStorage
+    };
+},
+mounted() {
+    window.addEventListener('storage', this.syncUserData);
+},
+beforeDestroy() {
+    window.removeEventListener('storage', this.syncUserData);
+},
+methods: {
+    syncUserData() {
+        // Update auth_user whenever 'user' in localStorage changes
+        this.auth_user = JSON.parse(localStorage.getItem('user')) || null;
     },
-    methods: {
-        async login() {
-            try {
-                const { data } = await api.post("/login", {
-                    email: this.email,
-                    password: this.password,
-                });
-                if (data.success) {
-                    localStorage.setItem("token", data.token);
-                    this.userlogin = true;
-                    this.loginSuccess = "Login successful!";
-                    this.loginFail = "";
-                }
-                this.$router.push("/dashboard");
-            } catch (error) {
-                this.loginFail =
-                    error.response?.data?.message || "Login failed!";
-                this.successMessage = "";
+    async login() {
+        try {
+            // localStorage.removeItem("token");
+            // localStorage.removeItem("user");
+
+            const { data } = await api.post("/login", {
+                email: this.email,
+                password: this.password,
+            });
+
+            if (data.success) {
+                // Set new token and user data
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                this.auth_user = data.user; // Immediately update auth_user state
+                this.loginSuccess = "Login successful!";
+                this.loginFail = "";
             }
-        },
+            this.$router.push("/dashboard");
+        } catch (error) {
+            this.loginFail =
+                error.response?.data?.message || "Login failed!";
+            this.successMessage = "";
+        }
     },
+},
 };
 </script>
 

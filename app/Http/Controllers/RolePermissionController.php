@@ -22,12 +22,10 @@ class RolePermissionController extends Controller
     {
         $role = Role::findOrFail($roleId);
 
-        // Sync permissions (replaces current permissions with new ones)
         $role->permissions()->sync($request->permissions);
 
         return response()->json(['message' => 'Permissions updated successfully.']);
     }
-
     public function add(Request $request) {
         $validator = validator($request->all(), [
             'role' => 'required|string|max:255|unique:roles,role',
@@ -62,5 +60,14 @@ class RolePermissionController extends Controller
             ], 500);
         }
     }
-
+    public function getPermissions($id) {
+        $roles = Role::findOrFail($id);
+        if(!$roles) {
+            return response()->json(['error' => 'Role not found.']);
+        }
+        $permissions = $roles->permissions()->pluck('permissions');
+        return response()->json([
+            'permissions' => $permissions,
+        ]);
+    }
 }

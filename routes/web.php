@@ -18,3 +18,7 @@ Route::get('/{any}', function () {
 
 // routes/web.php
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

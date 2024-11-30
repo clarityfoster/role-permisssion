@@ -1,60 +1,44 @@
 <template>
-    <div class="page-wrapper">
-        <nav class="sidebar">
-            <div class="d-flex align-items-center justify-content-center mb-4">
-                <router-link to="/dashboard" class="h2 text-decoration-none text-dark">
-                    RoleX
-                </router-link>
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item mb-2">
-                    <router-link
-                        class="nav-link"
-                        to="/dashboard"
-                        active-class="active"
-                        ><i class="bi bi-house-door me-2"></i>
-                        Dashboard
-                    </router-link>
-                </li>
-                <li class="nav-item mb-2">
-                    <router-link
-                        class="nav-link"
-                        to="/manageRole"
-                        active-class="active">
-                            <i class="bi bi-bar-chart me-2"></i> Manage Role
-                        </router-link>
-                </li>
-                <li class="nav-item mb-2">
-                    <router-link
-                        class="nav-link"
-                        to="/profile"
-                        active-class="active"
-                        ><i class="bi bi-person me-2"></i> Profile</router-link
-                    >
-                </li>
-            </ul>
-            <div v-if="!userlogin" class="mt-3">
-                <router-link to="/login" class="text-decoration-none text-success"
-                    ><i class="bi bi-box-arrow-in-right me-2"></i>
-                    Login</router-link
-                >
-            </div>
-            <div v-else>
-                <a
-                    @click.prevent="logout"
-                    href="#"
-                    class="text-decoration-none text-danger"
-                >
-                    <i class="bi bi-box-arrow-left me-2"></i>
-                    Log out
-                </a>
-            </div>
-        </nav>
-
-        <div class="main-content w-100">
-            <router-view></router-view>
+    <nav class="sidebar">
+        <div class="d-flex align-items-center justify-content-center mb-4">
+            <router-link
+                to="/dashboard"
+                class="h2 text-decoration-none text-dark"
+            >
+                RoleX
+            </router-link>
         </div>
-    </div>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <router-link
+                    class="nav-link"
+                    to="/dashboard"
+                    active-class="active"
+                    ><i class="bi bi-house-door me-2"></i>
+                    Dashboard
+                </router-link>
+            </li>
+            <li class="nav-item mb-2">
+                <router-link
+                    class="nav-link"
+                    to="/manageRole"
+                    active-class="active"
+                >
+                    <i class="bi bi-bar-chart me-2"></i> Manage Role
+                </router-link>
+            </li>
+        </ul>
+        <div>
+            <a
+                @click.prevent="logout"
+                href="#"
+                class="text-decoration-none text-danger"
+            >
+                <i class="bi bi-box-arrow-left me-2"></i>
+                Log out
+            </a>
+        </div>
+    </nav>
 </template>
 
 <script>
@@ -63,14 +47,21 @@ export default {
     name: "Sidebar",
     data() {
         return {
-            userlogin: !!localStorage.getItem("token"),
+            user: JSON.parse(localStorage.getItem("user")),
         };
     },
     methods: {
         async logout() {
             try {
-                await api.post("/logout");
-                this.userlogin = false;
+                const token = localStorage.getItem("token");
+                await api.post(
+                    "/logout",
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+
                 localStorage.removeItem("token");
                 this.$router.push("/login");
             } catch (error) {
@@ -82,45 +73,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .page-wrapper {
-        display: flex;
-    }
+.sidebar {
+    width: 300px; /* Width of sidebar */
+    background-color: #f8f9fa;
+    height: 100vh; /* Full height */
+    position: sticky; /* Fixes the sidebar on the left */
+    top: 0;
+    left: 0;
+    padding: 20px 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensures the sidebar stays on top */
+}
 
-    .sidebar {
-        width: 250px;
-        background-color: #f8f9fa;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 20px 15px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    }
+.main-content {
+    margin-left: 300px; /* Adds space for the sidebar */
+    padding: 20px; /* Optional padding for the main content */
+}
 
-    .sidebar .nav-link {
-        color: #495057;
-        border-radius: 5px;
-        pointer-events: auto;
-    }
+/* Styling for links in the sidebar */
+.sidebar .nav-link {
+    color: #495057;
+    border-radius: 5px;
+}
 
-    .sidebar .nav-link.disabled {
-        pointer-events: none;
-        opacity: 0.6;
-        color: gray;
-    }
-
-    .sidebar .nav-link:hover:not(.disabled),
-    .sidebar .nav-link.active {
-        background-color:#0d6efd;
-        font-weight: bold;
-        color: #fff;
-    }
-
-    .main-content {
-        margin-left: 250px;
-        padding: 20px;
-        background-color: #f4f4f4;
-        height: 100vh;
-        overflow-y: auto;
-    }
+.sidebar .nav-link:hover:not(.disabled),
+.sidebar .nav-link.active {
+    background-color: #0d6efd;
+    font-weight: bold;
+    color: #fff;
+}
 </style>

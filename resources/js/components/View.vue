@@ -56,7 +56,7 @@ export default {
         async fetchUsers(id) {
             try {
                 const { data } = await api.get(`/users/${id}/view`);
-                this.user = data.user; 
+                this.user = data.user;
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }

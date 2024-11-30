@@ -1,14 +1,16 @@
 <template>
     <div>
-        <Sidebar/>
+        <router-view></router-view>
     </div>
 </template>
 
 <script>
-    import Sidebar from './components/Sidebar.vue';
+    import Dashboard from './components/Dashboard.vue';
+    import ManageRole from './components/ManageRole.vue';
     export default {
         components: {
-            Sidebar,
+            Dashboard,
+            ManageRole,
         }
     }
 </script>

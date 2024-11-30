@@ -7,19 +7,21 @@ use App\Models\User;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\UserResource;
 
 class DashboardController extends Controller
 {
     public function dashboard() {
-        $users = User::with('role')->get();
+        $user = Auth::user();
+        $users = User::all();
         $roles = Role::all();
         $permissions = Permission::all();
         $authUser = Auth::user();
         return response()->json([
-            'auth_user' => $authUser,
             'permissions' => $permissions,
             'roles' => $roles,
-            'users' => $users,
+            'users' => UserResource::collection($users),
+            'user' => $user,
         ]);
     }
     public function changeUserRole(Request $request, $id)
@@ -69,13 +71,13 @@ class DashboardController extends Controller
             'addUser' => 'User added successfully!',
         ]);
     }
-    public function edit($id) {
+    public function view($id) {
         $user = User::findOrFail($id);
         return response()->json([
         'user' => $user,
       ]);
     }
-    public function view($id) {
+    public function edit($id) {
         $user = User::findOrFail($id);
         return response()->json([
         'user' => $user,

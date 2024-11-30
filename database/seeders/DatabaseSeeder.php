@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
                 'role' => $role
             ]);
         }
-        $permissions = ['user-create', 'user-read', 'user-update', 'user-delete', 'user-suspended'];
+        $permissions = ['user-create', 'user-read', 'user-update', 'user-delete', 'user-suspended', 'change-role'];
         foreach ($permissions as $permission) {
             Permission::create([
                 'permissions' => $permission

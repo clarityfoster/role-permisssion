@@ -1,15 +1,20 @@
 <template>
-    <div>
-        <h2>Welcome to Profile Page!</h2>
+    <div class="d-flex">
+        <SideBar />
+        <div>
+            <h2>Welcome to Profile Page!</h2>
+        </div>
     </div>
 </template>
 
 <script>
-    export default {
-        name: "Profile",
-    }
+import Sidebar from "./Sidebar.vue";
+export default {
+    components: {
+        Sidebar,
+    },
+    name: "Profile",
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
