@@ -101,9 +101,6 @@ methods: {
     },
     async login() {
         try {
-            // localStorage.removeItem("token");
-            // localStorage.removeItem("user");
-
             const { data } = await api.post("/login", {
                 email: this.email,
                 password: this.password,

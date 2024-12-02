@@ -20,6 +20,7 @@
             </li>
             <li class="nav-item mb-2">
                 <router-link
+                    v-if="user.role_id === 3"
                     class="nav-link"
                     to="/manageRole"
                     active-class="active"
@@ -53,17 +54,11 @@ export default {
     methods: {
         async logout() {
             try {
-                const token = localStorage.getItem("token");
-                await api.post(
-                    "/logout",
-                    {},
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
+                const user = localStorage.getItem("user");
+                localStorage.removeItem("user");
+                await api.post("/logout");
 
-                localStorage.removeItem("token");
-                this.$router.push("/login");
+                this.$router.push("/");
             } catch (error) {
                 console.error("Logout failed:", error);
             }

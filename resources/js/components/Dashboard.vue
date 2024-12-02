@@ -196,7 +196,7 @@ export default {
         user: {
             deep: true,
             handler() {
-                console.log("User updated:", this.user);
+                
             },
         },
     },

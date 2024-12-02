@@ -126,10 +126,13 @@ export default {
                     address: this.user.address,
                     role_id: this.user.role_id,
                 });
+
+                this.$router.push('/dashboard');
                 this.updateSuccess = "User's information updated successfully!";
                 setTimeout(() => {
                     this.updateSuccess = "";
                 }, 3000);
+
             } catch (error) {
                 console.error("Error updaing datas:", error);
                 alert("Failed to updating data.");
