@@ -2,7 +2,7 @@
     <div class="d-flex">
         <Sidebar />
         <main :key="refreshKey" class="p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4" style="min-width: 1400px;">
                 <div class="input-group w-50">
                     <input
                         v-model="searchQuery"
@@ -12,7 +12,7 @@
                         placeholder="Search"
                     />
                     <button
-                        @click="search"
+                        @click="searchQuery.trim() && search()"
                         class="btn btn-primary rounded-circle ms-2"
                     >
                         <i class="bi bi-search"></i>
@@ -59,7 +59,7 @@
                     Add User
                 </router-link>
             </div>
-            <table class="table custom-table align-middle shadow">
+            <table v-if="users.length > 0" class="table custom-table align-middle shadow">
                 <thead class="table-light">
                     <tr>
                         <th class="text-muted fw-normal">Id</th>
@@ -85,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="user in users" :key="user.id">
+                    <tr :class="{'table-active': user.id === loggedInUser.id}" v-for="user in users" :key="user.id">
                         <td class="text-dark fw-normal">{{ user.id }}</td>
                         <td>
                             <div
@@ -206,6 +206,9 @@
                     </tr>
                 </tbody>
             </table>
+            <div v-else class="d-flex align-items-center justify-content-center" style="height: 500px;">
+                <h5>No users found!</h5>
+            </div>
         </main>
     </div>
 </template>
@@ -239,10 +242,10 @@ export default {
             handler() {},
         },
         searchQuery(newSearchKey) {
-            if(!newSearchKey.trim()) {
+            if (!newSearchKey.trim()) {
                 this.fetchUser();
             }
-        }
+        },
     },
     computed: {
         loggedInUser() {
@@ -388,6 +391,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.table-active {
+    background-color: #f8f9fa !important; /* Light blue for highlight */
+}
 .table {
     border-radius: 15px;
     overflow: hidden;

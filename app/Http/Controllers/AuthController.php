@@ -36,6 +36,13 @@ class AuthController extends Controller
         $check = request()->only('email', 'password');
         if (auth()->attempt($check)) {
             $user = auth()->user();
+            if($user->suspended) {
+                Auth::logout();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your account is suspended.',
+                ], 403);
+            }
             if ($user) {
                 $token = $user->createToken('YourAppName')->plainTextToken;
                 return response()->json([

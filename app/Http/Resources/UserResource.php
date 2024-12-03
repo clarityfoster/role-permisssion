@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             'role'=> $this->role->role,
             'role_id' => $this->role_id,
             'permissions'=> $this->role->permissions,
+            'suspended' => $this->suspended,
         ];
     }
 }

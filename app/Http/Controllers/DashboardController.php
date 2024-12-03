@@ -125,7 +125,7 @@ class DashboardController extends Controller
             $users = User::where('name', 'LIKE', "%$searchQuery%")
                     ->get();
         } else {
-            return back();
+            return;
         }
         return response()->json([
             'users' => UserResource::collection($users),
