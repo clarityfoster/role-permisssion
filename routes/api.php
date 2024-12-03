@@ -26,6 +26,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/users', [DashboardController::class, 'dashboard'])->name('users.dashboard');
+    Route::post('/users/search', [DashboardController::class, 'search'])->name('users.search');
     Route::post('/users/add', [DashboardController::class, 'add'])->name('users.add');
     Route::get('/users/{id}/view', [DashboardController::class, 'view'])->name('users.view');
     Route::get('/users/{id}/edit', [DashboardController::class, 'edit'])->name('users.edit');

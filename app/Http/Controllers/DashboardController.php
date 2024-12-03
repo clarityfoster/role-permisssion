@@ -15,13 +15,15 @@ class DashboardController extends Controller
         $user = Auth::user();
         $users = User::all();
         $roles = Role::all();
+        $role_id = Role::pluck('id');
         $permissions = Permission::all();
         $authUser = Auth::user();
         return response()->json([
-            'permissions' => $permissions,
-            'roles' => $roles,
             'users' => UserResource::collection($users),
             'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'role_id' => $role_id,
         ]);
     }
     public function changeUserRole(Request $request, $id)
@@ -72,15 +74,19 @@ class DashboardController extends Controller
         ]);
     }
     public function view($id) {
-        $user = User::findOrFail($id);
+        $authUser = Auth::user();
+        $user = User::with('role')->findOrFail($id);
         return response()->json([
-        'user' => $user,
+            'auth_user' => $authUser,
+            'user' => $user,
       ]);
     }
     public function edit($id) {
+        $auth_user = Auth::user($id);
         $user = User::findOrFail($id);
         return response()->json([
         'user' => $user,
+        'auth_user' => $auth_user,
       ]);
     }
     public function update($id) {
@@ -111,6 +117,18 @@ class DashboardController extends Controller
         return response()->json([
             'user' => $user,
             'unsuspended' => 'User unsuspended!'
+        ]);
+    }
+    public function search() {
+        $searchQuery = request()->input('key');
+        if($searchQuery) {
+            $users = User::where('name', 'LIKE', "%$searchQuery%")
+                    ->get();
+        } else {
+            return back();
+        }
+        return response()->json([
+            'users' => UserResource::collection($users),
         ]);
     }
 }

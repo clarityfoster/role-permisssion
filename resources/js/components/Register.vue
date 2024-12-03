@@ -142,7 +142,7 @@ export default {
                     this.email = "";
                     this.password = "";
                     this.password_confirmation = "";
-                    this.$router.push("/login");
+                    this.$router.push("/");
                 }
             } catch (error) {
                 this.registerFailureMessage = "Registration failed! Try again.";

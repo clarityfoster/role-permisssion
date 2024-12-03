@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginComponent from './components/Login.vue';
 import RegisterComponent from './components/Register.vue';
 import DashboardComponent from './components/Dashboard.vue';
-import ProfileComponent from './components/Profile.vue';
 import ManageRoleComponent from './components/ManageRole.vue';
 import AddUserComponent from './components/AddUser.vue';
 import EditUserComponent from './components/EditUser.vue';
@@ -14,12 +13,6 @@ const routes = [
         path: '/dashboard',
         name: 'dashboard',
         component: DashboardComponent,
-        meta: { requiresAuth: true },
-    },
-    {
-        path: '/profile',
-        name: 'profile',
-        component: ProfileComponent,
         meta: { requiresAuth: true },
     },
     {

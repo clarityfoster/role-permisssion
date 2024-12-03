@@ -89,6 +89,7 @@ export default {
                 address: "",
                 role_id: "",
             },
+            auth_user: {},
             roles: [],
             error: null,
             updateSuccess: "",

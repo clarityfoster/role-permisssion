@@ -5,17 +5,40 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="input-group w-50">
                     <input
+                        v-model="searchQuery"
+                        name="search"
                         type="text"
                         class="form-control py-2 px-4 rounded-5"
                         placeholder="Search"
                     />
-                    <button class="btn btn-primary rounded-circle ms-2">
+                    <button
+                        @click="search"
+                        class="btn btn-primary rounded-circle ms-2"
+                    >
                         <i class="bi bi-search"></i>
                     </button>
                 </div>
-                <div class="d-flex flex-column align-items-start">
-                    <span v-if="user">{{ user.name }}</span>
-                    <small v-if="user">{{ user.email }}</small>
+                <div class="d-flex gap-2">
+                    <div
+                        @click="view(user.id)"
+                        class="d-flex align-items-center justify-content-center rounded-circle bg-danger"
+                        style="height: 43px; width: 43px; cursor: pointer"
+                    >
+                        <span class="text-white" style="font-size: 18px">
+                            {{ user.name[0] }}
+                        </span>
+                    </div>
+                    <div
+                        class="text-dark d-flex flex-column align-items-start"
+                        style="cursor: pointer"
+                    >
+                        <span @click="view(user.id)" v-if="user">{{
+                            user.name
+                        }}</span>
+                        <small @click="view(user.id)" v-if="user">{{
+                            user.email
+                        }}</small>
+                    </div>
                 </div>
             </div>
             <div
@@ -40,6 +63,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="text-muted fw-normal">Id</th>
+                        <th></th>
                         <th class="text-muted fw-normal">User Name</th>
                         <th class="text-muted fw-normal">Email</th>
                         <th class="text-muted fw-normal">Phone</th>
@@ -63,11 +87,23 @@
                 <tbody>
                     <tr v-for="user in users" :key="user.id">
                         <td class="text-dark fw-normal">{{ user.id }}</td>
+                        <td>
+                            <div
+                                class="d-flex align-items-center justify-content-center rounded-circle bg-danger"
+                                style="height: 50px; width: 50px"
+                            >
+                                <span
+                                    class="text-white"
+                                    style="font-size: 18px"
+                                    >{{ user.name[0] }}</span
+                                >
+                            </div>
+                        </td>
                         <td class="text-dark fw-semibold">{{ user.name }}</td>
                         <td class="text-muted">{{ user.email }}</td>
                         <td class="text-muted">{{ user.phone }}</td>
                         <td class="text-muted">{{ user.address }}</td>
-                        <td class="text-muted">
+                        <td>
                             <span
                                 :class="getBadgeClass(user.role_id)"
                                 class="badge"
@@ -131,7 +167,10 @@
                             </div>
                         </td>
                         <td
-                            v-if="hasPermissions('user-suspended') && user.id !== loggedInUser.id"
+                            v-if="
+                                hasPermissions('user-suspended') &&
+                                user.id !== loggedInUser.id
+                            "
                             class="text-muted"
                         >
                             <button
@@ -185,8 +224,10 @@ export default {
             user: JSON.parse(localStorage.getItem("user")),
             users: [],
             roles: [],
+            role_id: [],
             userDeleteAlert: "",
             refreshKey: 0,
+            searchQuery: "",
         };
     },
     mounted() {
@@ -195,18 +236,31 @@ export default {
     watch: {
         user: {
             deep: true,
-            handler() {
-                
-            },
+            handler() {},
         },
+        searchQuery(newSearchKey) {
+            if(!newSearchKey.trim()) {
+                this.fetchUser();
+            }
+        }
     },
     computed: {
         loggedInUser() {
             return this.user;
         },
     },
-
     methods: {
+        async search() {
+            const search = {
+                key: this.searchQuery,
+            };
+            try {
+                const { data } = await api.post("/users/search", search);
+                this.users = data.users;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         refreshView() {
             this.refreshKey++;
         },
@@ -321,11 +375,11 @@ export default {
         },
         getBadgeClass(role_id) {
             const roleColorMapping = {
-                1: "bg-secondary",
+                1: "bg-info",
                 2: "bg-success",
-                3: "bg-primary",
-                4: "bg-info",
-                5: "bg-warning",
+                3: "bg-warning",
+                4: "bg-primary",
+                5: "bg-danger",
             };
             return roleColorMapping[role_id] || "bg-secondary";
         },
