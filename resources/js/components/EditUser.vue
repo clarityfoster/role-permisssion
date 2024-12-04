@@ -47,7 +47,7 @@
                         name="address"
                     />
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" v-if="auth_user.role_id === 3 || user.role_id === 3">
                     <label for="role">Role</label>
                     <select
                         name="role_id"

@@ -6,10 +6,11 @@
                 <div class="input-group w-50">
                     <input
                         v-model="searchQuery"
+                        @keyup.enter="search"
                         name="search"
                         type="text"
                         class="form-control py-2 px-4 rounded-5"
-                        placeholder="Search"
+                        placeholder="Search users..."
                     />
                     <button
                         @click="searchQuery.trim() && search()"
