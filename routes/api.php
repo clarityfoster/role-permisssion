@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users/{userId}/suspend', [DashboardController::class, 'suspended'])->name('users.suspend');
     Route::post('/users/{userId}/unsuspend', [DashboardController::class, 'unsuspended'])->name('users.unsuspend');
     Route::post('/users/{userId}/change-role', [DashboardController::class, 'changeUserRole'])->name('users.changeRole');
+    Route::post('/roles/filter', [DashboardController::class, 'filterByRole'])->name('users.filter');
 
     Route::get('/permissions-and-roles', [RolePermissionController::class, 'index'])->name('roles.index');
     Route::post('/roles/add', [RolePermissionController::class, 'add'])->name('roles.add');

@@ -33,12 +33,12 @@
                         class="text-dark d-flex flex-column align-items-start"
                         style="cursor: pointer"
                     >
-                        <span @click="view(user.id)" v-if="user">{{
-                            user.name
-                        }}</span>
-                        <small @click="view(user.id)" v-if="user">{{
-                            user.email
-                        }}</small>
+                        <span @click="view(user.id)" v-if="user">
+                            {{ user.name }}
+                        </span>
+                        <small @click="view(user.id)" v-if="user">
+                            {{ user.email }}
+                        </small>
                     </div>
                 </div>
             </div>
@@ -49,16 +49,44 @@
             >
                 {{ userDeleteAlert }}
             </div>
+
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h3>Users List</h3>
-                <router-link
-                    v-if="hasPermissions('user-create')"
-                    class="btn btn-primary"
-                    to="/users/add"
-                >
-                    <i class="bi bi-plus-lg me-1"></i>
-                    Add User
-                </router-link>
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+
+                                >
+                                    All
+                                </a>
+                            </li>
+                            <li v-for="role in roles" :key="role.id">
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+                                    @click.prevent="filterByRole(role.id)"
+                                >
+                                    {{ role.role }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <router-link
+                        v-if="hasPermissions('user-create')"
+                        class="btn btn-primary"
+                        to="/users/add"
+                    >
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Add User
+                    </router-link>
+                </div>
             </div>
             <table v-if="users.length > 0" class="table custom-table align-middle shadow">
                 <thead class="table-light">
@@ -86,7 +114,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr :class="{'table-active': user.id === loggedInUser.id}" v-for="user in users" :key="user.id">
+                    <tr v-for="user in users" :key="user.id">
                         <td class="text-dark fw-normal">{{ user.id }}</td>
                         <td>
                             <div
@@ -96,11 +124,15 @@
                                 <span
                                     class="text-white"
                                     style="font-size: 18px"
-                                    >{{ user.name[0] }}</span
-                                >
+                                    >
+                                    {{ user.name[0] }}
+                                </span>
                             </div>
                         </td>
-                        <td class="text-dark fw-semibold">{{ user.name }}</td>
+                        <td class="text-dark fw-semibold">
+                            {{ user.name }}
+                            <small v-if="user.id === loggedInUser.id">(Me)</small>
+                        </td>
                         <td class="text-muted">{{ user.email }}</td>
                         <td class="text-muted">{{ user.phone }}</td>
                         <td class="text-muted">{{ user.address }}</td>
@@ -109,7 +141,7 @@
                                 :class="getBadgeClass(user.role_id)"
                                 class="badge"
                             >
-                                {{ user.role }}
+                                {{ user.role.role }}
                             </span>
                         </td>
                         <td class="text-muted">
@@ -254,6 +286,16 @@ export default {
         },
     },
     methods: {
+        async filterByRole(roleId) {
+          try {
+              const {data} = await api.post("/roles/filter", {role_id: roleId});
+              this.users = data.users;
+              this.roles = data.roles;
+              console.log('Filter by roles:', data);
+          }  catch (e) {
+              console.error("Error filtering users by role:", e);
+          }
+        },
         async search() {
             const search = {
                 key: this.searchQuery,
@@ -284,6 +326,8 @@ export default {
                 const { data } = await api.get("/users");
                 this.users = data.users;
                 this.roles = data.roles;
+
+                console.log('Users: ', data);
 
                 const role = this.roles.find(
                     (role) => role.id === this.user.role_id

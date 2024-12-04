@@ -13,13 +13,14 @@ class DashboardController extends Controller
 {
     public function dashboard() {
         $user = Auth::user();
-        $users = User::all();
+        $users = User::with('role')->get();
         $roles = Role::all();
         $role_id = Role::pluck('id');
         $permissions = Permission::all();
         $authUser = Auth::user();
         return response()->json([
-            'users' => UserResource::collection($users),
+            'users' => $users,
+//            'users' => UserResource::collection($users),
             'user' => $user,
             'roles' => $roles,
             'permissions' => $permissions,
@@ -129,6 +130,15 @@ class DashboardController extends Controller
         }
         return response()->json([
             'users' => UserResource::collection($users),
+        ]);
+    }
+    public function filterByRole() {
+        $roles = Role::all();
+        $roleId = request()->role_id;
+        $users = User::with('role')->where('role_id', $roleId)->get();
+        return response()->json([
+            'roles' => $roles,
+            'users' => $users,
         ]);
     }
 }
