@@ -79,6 +79,39 @@
                             </li>
                         </ul>
                     </div>
+                    <div class="dropdown me-2">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-filter"></i> Sorting
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+                                    @click.prevent="sorting('default')"
+
+                                >
+                                    <i class="bi bi-sort-down"></i> Default Sorting
+                                </a>
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+                                    @click.prevent="sorting('asc')"
+
+                                >
+                                    <i class="bi bi-sort-alpha-down"></i> Sort A to Z
+                                </a>
+                                <a
+                                    href="#"
+                                    class="dropdown-item"
+                                    @click.prevent="sorting('desc')"
+
+                                >
+                                    <i class="bi bi-sort-alpha-down-alt"></i> Sort Z to A
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                     <router-link
                         v-if="hasPermissions('user-create')"
                         class="btn btn-primary"
@@ -288,14 +321,18 @@ export default {
         },
     },
     methods: {
-        async filterByRoleAll(roleId = null) {
-            try {
-                const { data } = await api.post("/roles/filter", { role_id: roleId });
-                this.data = data.users;
-                this.roles = data.roles;
-            } catch (e) {
-                console.error("Error filtering users by role:", e);
-            }
+        async sorting(order) {
+          try {
+              if(order === 'asc') {
+                  this.users.sort((a, b) => a.name.localeCompare(b.name));
+              } else if (order === 'desc') {
+                  this.users.sort((a,b) => b.name.localeCompare(a.name));
+              } else {
+                  this.fetchUser();
+              }
+          }  catch (e) {
+              console.log('Sorting error:', e);
+          }
         },
         async filterByRole(roleId) {
           try {

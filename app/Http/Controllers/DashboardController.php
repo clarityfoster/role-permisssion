@@ -124,6 +124,9 @@ class DashboardController extends Controller
         $searchQuery = request()->input('key');
         if($searchQuery) {
             $users = User::where('name', 'LIKE', "%$searchQuery%")
+                    ->orWhere('email', 'LIKE', "%$searchQuery%")
+                    ->orWhere('address', 'LIKE', "%$searchQuery%")
+                    ->orWhere('phone', 'LIKE', "%$searchQuery%")
                     ->get();
         } else {
             return;
