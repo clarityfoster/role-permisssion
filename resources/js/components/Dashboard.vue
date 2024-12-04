@@ -62,6 +62,7 @@
                                 <a
                                     href="#"
                                     class="dropdown-item"
+                                    @click.prevent="filterByRole()"
 
                                 >
                                     All
@@ -249,6 +250,7 @@
 <script>
 import api from "../api/axios.js";
 import Sidebar from "./Sidebar.vue";
+import {NULL} from "sass";
 
 export default {
     components: {
@@ -286,6 +288,15 @@ export default {
         },
     },
     methods: {
+        async filterByRoleAll(roleId = null) {
+            try {
+                const { data } = await api.post("/roles/filter", { role_id: roleId });
+                this.data = data.users;
+                this.roles = data.roles;
+            } catch (e) {
+                console.error("Error filtering users by role:", e);
+            }
+        },
         async filterByRole(roleId) {
           try {
               const {data} = await api.post("/roles/filter", {role_id: roleId});

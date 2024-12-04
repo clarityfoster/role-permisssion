@@ -135,7 +135,9 @@ class DashboardController extends Controller
     public function filterByRole() {
         $roles = Role::all();
         $roleId = request()->role_id;
-        $users = User::with('role')->where('role_id', $roleId)->get();
+        $users = $roleId ?
+                User::with('role')->where('role_id', $roleId)->get()
+                : User::with('role')->get();
         return response()->json([
             'roles' => $roles,
             'users' => $users,
