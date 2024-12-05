@@ -2,7 +2,10 @@
     <div class="d-flex">
         <Sidebar />
         <main :key="refreshKey" class="p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4" style="min-width: 1400px;">
+            <div
+                class="d-flex justify-content-between align-items-center mb-4"
+                style="min-width: 1400px"
+            >
                 <div class="input-group w-50">
                     <input
                         v-model="searchQuery"
@@ -53,7 +56,12 @@
                 <h3>Users List</h3>
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="dropdown me-2">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button
+                            class="btn btn-primary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
                             <i class="bi bi-funnel"></i> Filter
                         </button>
                         <ul class="dropdown-menu">
@@ -62,7 +70,6 @@
                                     href="#"
                                     class="dropdown-item"
                                     @click.prevent="filterByRoleNull(null)"
-
                                 >
                                     All
                                 </a>
@@ -79,7 +86,12 @@
                         </ul>
                     </div>
                     <div class="dropdown me-2">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button
+                            class="btn btn-primary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
                             <i class="bi bi-filter"></i> Sorting
                         </button>
                         <ul class="dropdown-menu">
@@ -88,25 +100,25 @@
                                     href="#"
                                     class="dropdown-item"
                                     @click.prevent="sorting('default')"
-
                                 >
-                                    <i class="bi bi-sort-down"></i> Default Sorting
+                                    <i class="bi bi-sort-down"></i> Default
+                                    Sorting
                                 </a>
                                 <a
                                     href="#"
                                     class="dropdown-item"
                                     @click.prevent="sorting('asc')"
-
                                 >
-                                    <i class="bi bi-sort-alpha-down"></i> Sort A to Z
+                                    <i class="bi bi-sort-alpha-down"></i> Sort A
+                                    to Z
                                 </a>
                                 <a
                                     href="#"
                                     class="dropdown-item"
                                     @click.prevent="sorting('desc')"
-
                                 >
-                                    <i class="bi bi-sort-alpha-down-alt"></i> Sort Z to A
+                                    <i class="bi bi-sort-alpha-down-alt"></i>
+                                    Sort Z to A
                                 </a>
                             </li>
                         </ul>
@@ -121,26 +133,31 @@
                     </router-link>
                 </div>
             </div>
-            <table v-if="users.length > 0" class="table custom-table align-middle shadow">
+            <table
+                v-if="users.length > 0"
+                class="table custom-table align-middle shadow"
+            >
                 <thead class="table-light">
                     <tr>
-                        <th class="text-muted fw-normal">Id</th>
-                        <th></th>
-                        <th class="text-muted fw-normal">User Name</th>
-                        <th class="text-muted fw-normal">Email</th>
-                        <th class="text-muted fw-normal">Phone</th>
-                        <th class="text-muted fw-normal">Address</th>
-                        <th class="text-muted fw-normal">Role</th>
-                        <th class="text-muted fw-normal">Actions</th>
+                        <th class="text-white fw-normal bg-primary">Id</th>
+                        <th class="text-white fw-normal bg-primary"></th>
+                        <th class="text-white fw-normal bg-primary">
+                            User Name
+                        </th>
+                        <th class="text-white fw-normal bg-primary">Email</th>
+                        <th class="text-white fw-normal bg-primary">Phone</th>
+                        <th class="text-white fw-normal bg-primary">Address</th>
+                        <th class="text-white fw-normal bg-primary">Role</th>
+                        <th class="text-white fw-normal bg-primary">Actions</th>
                         <th
                             v-if="hasPermissions('user-suspended')"
-                            class="text-muted fw-normal"
+                            class="text-white fw-normal bg-primary"
                         >
                             Status
                         </th>
                         <th
                             v-if="hasPermissions('user-delete')"
-                            class="text-muted fw-normal"
+                            class="text-white fw-normal bg-primary"
                         >
                             Delete
                         </th>
@@ -148,7 +165,12 @@
                 </thead>
                 <tbody>
                     <tr v-for="user in users" :key="user.id">
-                        <td class="text-dark fw-normal">{{ user.id }}</td>
+                        <td
+                            :class=" user.id === loggedInUser.id
+                                    ? 'text-dark': 'text-secondary'"
+                        >
+                            {{ user.id }}
+                        </td>
                         <td>
                             <div
                                 class="d-flex align-items-center justify-content-center rounded-circle bg-danger"
@@ -157,18 +179,20 @@
                                 <span
                                     class="text-white"
                                     style="font-size: 18px"
-                                    >
+                                >
                                     {{ user.name[0] }}
                                 </span>
                             </div>
                         </td>
-                        <td class="text-dark fw-semibold">
+                        <td class="fw-semibold" :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">
                             {{ user.name }}
-                            <small v-if="user.id === loggedInUser.id">(Me)</small>
+                            <small v-if="user.id === loggedInUser.id"
+                                >(Me)</small
+                            >
                         </td>
-                        <td class="text-muted">{{ user.email }}</td>
-                        <td class="text-muted">{{ user.phone }}</td>
-                        <td class="text-muted">{{ user.address }}</td>
+                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.email }}</td>
+                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.phone }}</td>
+                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.address }}</td>
                         <td>
                             <span
                                 :class="getBadgeClass(user.role_id)"
@@ -272,11 +296,16 @@
                     </tr>
                 </tbody>
             </table>
-            <div v-else class="d-flex align-items-center justify-content-center" style="height: 500px;">
+            <div
+                v-else
+                class="d-flex align-items-center justify-content-center"
+                style="height: 500px"
+            >
                 <h5>No users found!</h5>
             </div>
-            <div v-if="users.length > 0" class="d-flex justify-content-between align-items-center mt-4">
+            <div class="d-flex justify-content-between align-items-center mt-4">
                 <button
+                    v-if="users.length > 0"
                     class="btn btn-primary"
                     :disabled="pagination.current_page === 1"
                     @click="fetchUser(pagination.current_page - 1)"
@@ -284,11 +313,13 @@
                     <i class="bi bi-arrow-left-short"></i>
                 </button>
 
-                <span>
-                    Page {{ pagination.current_page }} of {{ pagination.last_page }}
+                <span v-if="users.length > 0">
+                    Page {{ pagination.current_page }} of
+                    {{ pagination.last_page }}
                 </span>
 
                 <button
+                    v-if="users.length > 0"
                     class="btn btn-primary"
                     :disabled="pagination.current_page === pagination.last_page"
                     @click="fetchUser(pagination.current_page + 1)"
@@ -303,7 +334,6 @@
 <script>
 import api from "../api/axios.js";
 import Sidebar from "./Sidebar.vue";
-import {NULL} from "sass";
 
 export default {
     components: {
@@ -324,7 +354,7 @@ export default {
                 last_page: 2,
                 total: 0,
                 per_page: 7,
-            }
+            },
         };
     },
     mounted() {
@@ -348,36 +378,40 @@ export default {
     },
     methods: {
         async sorting(order) {
-          try {
-              if(order === 'asc') {
-                  this.users.sort((a, b) => a.name.localeCompare(b.name));
-              } else if (order === 'desc') {
-                  this.users.sort((a,b) => b.name.localeCompare(a.name));
-              } else {
-                  this.fetchUser();
-              }
-          }  catch (e) {
-              console.log('Sorting error:', e);
-          }
+            try {
+                if (order === "asc") {
+                    this.users.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (order === "desc") {
+                    this.users.sort((a, b) => b.name.localeCompare(a.name));
+                } else {
+                    this.fetchUser();
+                }
+            } catch (e) {
+                console.log("Sorting error:", e);
+            }
         },
         async filterByRoleNull(roleId = null) {
             try {
-                const {data} = await api.post("roles/filter", {role_id: roleId});
+                const { data } = await api.post("roles/filter", {
+                    role_id: roleId,
+                });
                 this.users = data.users;
                 this.roles = data.roles;
-                this.fetchUser( 1);
+                this.fetchUser(1);
             } catch (e) {
                 console.error("Error filtering users by role:", e);
             }
         },
         async filterByRole(roleId) {
-          try {
-              const {data} = await api.post("/roles/filter", {role_id: roleId});
-              this.users = data.users;
-              this.roles = data.roles;
-          }  catch (e) {
-              console.error("Error filtering users by role:", e);
-          }
+            try {
+                const { data } = await api.post("/roles/filter", {
+                    role_id: roleId,
+                });
+                this.users = data.users;
+                this.roles = data.roles;
+            } catch (e) {
+                console.error("Error filtering users by role:", e);
+            }
         },
         async search() {
             const search = {
@@ -407,7 +441,7 @@ export default {
             }
             try {
                 const { data } = await api.get(`/users?page=${page}`);
-                this.users = data.users.data; // Access the paginated data array
+                this.users = data.users.data;
                 this.roles = data.roles;
 
                 const role = this.roles.find(
@@ -419,7 +453,6 @@ export default {
                     );
                     this.user.permissions = permissionsData.permissions || [];
                 }
-                // Update pagination data
                 this.pagination = {
                     current_page: data.users.current_page,
                     last_page: data.users.last_page,
@@ -427,7 +460,7 @@ export default {
                     per_page: data.users.per_page,
                 };
 
-                console.log('Users: ', data);
+                console.log("Users: ", data);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -439,14 +472,12 @@ export default {
                 });
 
                 if (userId === this.user.id) {
-                    // Fetch new permissions for the updated role
                     const { data: permissionsData } = await api.get(
                         `/roles/${roleId}/permissions`
                     );
                     const updatedPermissions =
                         permissionsData.permissions || [];
 
-                    // Trigger reactivity by updating the user object entirely
                     this.user = {
                         ...this.user,
                         role_id: roleId,
@@ -455,7 +486,6 @@ export default {
                     localStorage.setItem("user", JSON.stringify(this.user));
                 }
 
-                // Refresh the user list
                 this.fetchUser();
             } catch (error) {
                 console.error("Error updating user role:", error);

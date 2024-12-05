@@ -24,13 +24,16 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected Routes
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/auth-user', function () {
+        return response()->json(['auth_user' => auth()->user()]);
+    });
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/users', [DashboardController::class, 'dashboard'])->name('users.dashboard');
     Route::post('/users/search', [DashboardController::class, 'search'])->name('users.search');
     Route::post('/users/add', [DashboardController::class, 'add'])->name('users.add');
     Route::get('/users/{id}/view', [DashboardController::class, 'view'])->name('users.view');
     Route::get('/users/{id}/edit', [DashboardController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{id}/update', [DashboardController::class, 'update'])->name('users.update');
+    Route::put('/users/{id}/update', [DashboardController::class, 'update']);
     Route::post('/users/{userId}/delete', [DashboardController::class, 'delete'])->name('users.delete');
     Route::post('/users/{userId}/suspend', [DashboardController::class, 'suspended'])->name('users.suspend');
     Route::post('/users/{userId}/unsuspend', [DashboardController::class, 'unsuspended'])->name('users.unsuspend');

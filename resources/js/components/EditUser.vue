@@ -47,7 +47,7 @@
                         name="address"
                     />
                 </div>
-                <div class="mb-3" v-if="auth_user.role_id === 3 || user.role_id === 3">
+                <div class="mb-3" v-if="auth_user.role_id === 3">
                     <label for="role">Role</label>
                     <select
                         name="role_id"
@@ -98,13 +98,21 @@ export default {
     mounted() {
         this.fetchRoles();
         this.fetchUsers();
+        this.fetchAuthUser();
     },
     methods: {
+        async fetchAuthUser() {
+            try {
+                const {data} = await api.get('/auth-user');
+                this.auth_user = data.auth_user;
+            } catch(e) {
+                console.error("Error fetching authenticated user:", e);
+            }
+        },
         async fetchUsers(id) {
             try {
                 const { data } = await api.get(`/users/${this.id}/edit`);
                 this.user = data.user;
-                console.log(data);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
