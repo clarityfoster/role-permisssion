@@ -49,7 +49,6 @@
             >
                 {{ userDeleteAlert }}
             </div>
-
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h3>Users List</h3>
                 <div class="d-flex align-items-center justify-content-center">
@@ -62,7 +61,7 @@
                                 <a
                                     href="#"
                                     class="dropdown-item"
-                                    @click.prevent="filterByRole()"
+                                    @click.prevent="filterByRoleNull(null)"
 
                                 >
                                     All
@@ -276,6 +275,27 @@
             <div v-else class="d-flex align-items-center justify-content-center" style="height: 500px;">
                 <h5>No users found!</h5>
             </div>
+            <div v-if="users.length > 0" class="d-flex justify-content-between align-items-center mt-4">
+                <button
+                    class="btn btn-primary"
+                    :disabled="pagination.current_page === 1"
+                    @click="fetchUser(pagination.current_page - 1)"
+                >
+                    <i class="bi bi-arrow-left-short"></i>
+                </button>
+
+                <span>
+                    Page {{ pagination.current_page }} of {{ pagination.last_page }}
+                </span>
+
+                <button
+                    class="btn btn-primary"
+                    :disabled="pagination.current_page === pagination.last_page"
+                    @click="fetchUser(pagination.current_page + 1)"
+                >
+                    <i class="bi bi-arrow-right-short"></i>
+                </button>
+            </div>
         </main>
     </div>
 </template>
@@ -299,6 +319,12 @@ export default {
             userDeleteAlert: "",
             refreshKey: 0,
             searchQuery: "",
+            pagination: {
+                current_page: 1,
+                last_page: 2,
+                total: 0,
+                per_page: 7,
+            }
         };
     },
     mounted() {
@@ -334,12 +360,21 @@ export default {
               console.log('Sorting error:', e);
           }
         },
+        async filterByRoleNull(roleId = null) {
+            try {
+                const {data} = await api.post("roles/filter", {role_id: roleId});
+                this.users = data.users;
+                this.roles = data.roles;
+                this.fetchUser( 1);
+            } catch (e) {
+                console.error("Error filtering users by role:", e);
+            }
+        },
         async filterByRole(roleId) {
           try {
               const {data} = await api.post("/roles/filter", {role_id: roleId});
               this.users = data.users;
               this.roles = data.roles;
-              console.log('Filter by roles:', data);
           }  catch (e) {
               console.error("Error filtering users by role:", e);
           }
@@ -364,18 +399,16 @@ export default {
             }
             return this.user.permissions.includes(permission);
         },
-        async fetchUser() {
+        async fetchUser(page = 1) {
             const token = localStorage.getItem("token");
             if (!token) {
                 console.error("No token found. Please log in.");
                 return;
             }
             try {
-                const { data } = await api.get("/users");
-                this.users = data.users;
+                const { data } = await api.get(`/users?page=${page}`);
+                this.users = data.users.data; // Access the paginated data array
                 this.roles = data.roles;
-
-                console.log('Users: ', data);
 
                 const role = this.roles.find(
                     (role) => role.id === this.user.role_id
@@ -386,6 +419,15 @@ export default {
                     );
                     this.user.permissions = permissionsData.permissions || [];
                 }
+                // Update pagination data
+                this.pagination = {
+                    current_page: data.users.current_page,
+                    last_page: data.users.last_page,
+                    total: data.users.total,
+                    per_page: data.users.per_page,
+                };
+
+                console.log('Users: ', data);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -473,9 +515,9 @@ export default {
             const roleColorMapping = {
                 1: "bg-info",
                 2: "bg-success",
-                3: "bg-warning",
+                3: "bg-danger",
                 4: "bg-primary",
-                5: "bg-danger",
+                5: "bg-warning",
             };
             return roleColorMapping[role_id] || "bg-secondary";
         },

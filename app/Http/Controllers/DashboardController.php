@@ -13,7 +13,7 @@ class DashboardController extends Controller
 {
     public function dashboard() {
         $user = Auth::user();
-        $users = User::with('role')->get();
+        $users = User::with('role')->paginate(7);
         $roles = Role::all();
         $role_id = Role::pluck('id');
         $permissions = Permission::all();
