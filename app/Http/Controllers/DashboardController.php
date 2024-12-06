@@ -140,7 +140,7 @@ class DashboardController extends Controller
         $roleId = request()->role_id;
         $users = $roleId ?
                 User::with('role')->where('role_id', $roleId)->get()
-                : User::with('role')->get();
+                : User::with('role')->paginate(7);
         return response()->json([
             'roles' => $roles,
             'users' => $users,

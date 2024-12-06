@@ -109,8 +109,8 @@
                                     class="dropdown-item"
                                     @click.prevent="sorting('asc')"
                                 >
-                                    <i class="bi bi-sort-alpha-down"></i> Sort A
-                                    to Z
+                                    <i class="bi bi-sort-alpha-down"></i>
+                                    Sort by <b>A</b> to <b>Z</b>
                                 </a>
                                 <a
                                     href="#"
@@ -118,7 +118,7 @@
                                     @click.prevent="sorting('desc')"
                                 >
                                     <i class="bi bi-sort-alpha-down-alt"></i>
-                                    Sort Z to A
+                                    Sort by <b>Z</b> to <b>A</b>
                                 </a>
                             </li>
                         </ul>
