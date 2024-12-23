@@ -40,10 +40,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users/{userId}/change-role', [DashboardController::class, 'changeUserRole'])->name('users.changeRole');
     Route::post('/roles/filter', [DashboardController::class, 'filterByRole'])->name('users.filter');
 
-    Route::get('/permissions-and-roles', [RolePermissionController::class, 'index'])->name('roles.index');
-    Route::post('/roles/add', [RolePermissionController::class, 'add'])->name('roles.add');
-    Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'updateRolePermissions'])->name('roles.updatePermissions');
-    Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getPermissions'])->name('roles.getPermissions');
+    Route::get('/permissions-and-roles', [RolePermissionController::class, 'index']);
+    Route::post('/roles/add', [RolePermissionController::class, 'add']);
+    Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'updateRolePermissions']);
+    Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getPermissions']);
 
     Route::get('/user', function (Request $request) {
         $user = $request->user();

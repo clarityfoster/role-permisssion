@@ -20,7 +20,6 @@ class DashboardController extends Controller
         $authUser = Auth::user();
         return response()->json([
             'users' => $users,
-//            'users' => UserResource::collection($users),
             'user' => $user,
             'roles' => $roles,
             'permissions' => $permissions,
@@ -136,7 +135,7 @@ class DashboardController extends Controller
         ]);
     }
     public function filterByRole() {
-        $roles = Role::all();
+        $roles = Role::with('user')->get();
         $roleId = request()->role_id;
         $users = $roleId ?
                 User::with('role')->where('role_id', $roleId)->get()

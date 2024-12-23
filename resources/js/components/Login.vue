@@ -96,7 +96,6 @@ beforeDestroy() {
 },
 methods: {
     syncUserData() {
-        // Update auth_user whenever 'user' in localStorage changes
         this.auth_user = JSON.parse(localStorage.getItem('user')) || null;
     },
     async login() {
@@ -107,18 +106,17 @@ methods: {
             });
 
             if (data.success) {
-                // Set new token and user data
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
 
-                this.auth_user = data.user; // Immediately update auth_user state
+                this.auth_user = data.user;
                 this.loginSuccess = "Login successful!";
                 this.loginFail = "";
             }
             this.$router.push("/dashboard");
         } catch (error) {
             this.loginFail =
-                error.response?.data?.message || "Login failed!";
+                error.response?.data?.message || "Incorrect email or password!";
             this.successMessage = "";
         }
     },

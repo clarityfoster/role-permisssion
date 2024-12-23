@@ -10,7 +10,9 @@
                 >
                     {{ updateSuccess }}
                 </div>
-                <h3 class="mb-4">Edit User's Information</h3>
+                <h3 class="mb-4">Edit
+                    <span class="text-primary">{{ user.name }}</span>'s
+                    Information</h3>
                 <div class="mb-3">
                     <label for="title">Name</label>
                     <input

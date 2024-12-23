@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex">
         <Sidebar />
-        <main :key="refreshKey" class="p-4">
+        <main class="p-4">
             <div
                 class="d-flex justify-content-between align-items-center mb-4"
                 style="min-width: 1400px"
@@ -13,7 +13,7 @@
                         name="search"
                         type="text"
                         class="form-control py-2 px-4 rounded-5"
-                        placeholder="Search users..."
+                        placeholder="Search..."
                     />
                     <button
                         @click="searchQuery.trim() && search()"
@@ -69,7 +69,7 @@
                                 <a
                                     href="#"
                                     class="dropdown-item"
-                                    @click.prevent="filterByRoleNull(null)"
+                                    @click.prevent="filterByAll()"
                                 >
                                     All
                                 </a>
@@ -78,7 +78,9 @@
                                 <a
                                     href="#"
                                     class="dropdown-item"
-                                    @click.prevent="filterByRole(role.id)"
+                                    @click.prevent="
+                                        filterByRole({ roleId: role.id })
+                                    "
                                 >
                                     {{ role.role }}
                                 </a>
@@ -166,8 +168,11 @@
                 <tbody>
                     <tr v-for="user in users" :key="user.id">
                         <td
-                            :class=" user.id === loggedInUser.id
-                                    ? 'text-dark': 'text-secondary'"
+                            :class="
+                                user.id === loggedInUser.id
+                                    ? 'text-dark'
+                                    : 'text-secondary'
+                            "
                         >
                             {{ user.id }}
                         </td>
@@ -184,15 +189,46 @@
                                 </span>
                             </div>
                         </td>
-                        <td class="fw-semibold" :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">
+                        <td
+                            class="fw-semibold"
+                            :class="
+                                user.id === loggedInUser.id
+                                    ? 'text-dark'
+                                    : 'text-secondary'
+                            "
+                        >
                             {{ user.name }}
                             <small v-if="user.id === loggedInUser.id"
                                 >(Me)</small
                             >
                         </td>
-                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.email }}</td>
-                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.phone }}</td>
-                        <td :class=" user.id === loggedInUser.id ? 'text-dark': 'text-secondary'">{{ user.address }}</td>
+                        <td
+                            :class="
+                                user.id === loggedInUser.id
+                                    ? 'text-dark'
+                                    : 'text-secondary'
+                            "
+                        >
+                            {{ user.email }}
+                        </td>
+                        <td
+                            :class="
+                                user.id === loggedInUser.id
+                                    ? 'text-dark'
+                                    : 'text-secondary'
+                            "
+                        >
+                            {{ user.phone }}
+                        </td>
+                        <td
+                            :class="
+                                user.id === loggedInUser.id
+                                    ? 'text-dark'
+                                    : 'text-secondary'
+                            "
+                        >
+                            {{ user.address }}
+                        </td>
                         <td>
                             <span
                                 :class="getBadgeClass(user.role_id)"
@@ -297,7 +333,7 @@
                 </tbody>
             </table>
             <div
-                v-else
+               v-if="users.length === 0"
                 class="d-flex align-items-center justify-content-center"
                 style="height: 500px"
             >
@@ -312,12 +348,10 @@
                 >
                     <i class="bi bi-arrow-left-short"></i>
                 </button>
-
                 <span v-if="users.length > 0">
                     Page {{ pagination.current_page }} of
                     {{ pagination.last_page }}
                 </span>
-
                 <button
                     v-if="users.length > 0"
                     class="btn btn-primary"
@@ -334,6 +368,7 @@
 <script>
 import api from "../api/axios.js";
 import Sidebar from "./Sidebar.vue";
+import { mapActions, mapState } from "vuex";
 
 export default {
     components: {
@@ -343,28 +378,14 @@ export default {
     data() {
         return {
             user: JSON.parse(localStorage.getItem("user")),
-            users: [],
-            roles: [],
-            role_id: [],
             userDeleteAlert: "",
-            refreshKey: 0,
             searchQuery: "",
-            pagination: {
-                current_page: 1,
-                last_page: 2,
-                total: 0,
-                per_page: 7,
-            },
         };
     },
     mounted() {
         this.fetchUser();
     },
     watch: {
-        user: {
-            deep: true,
-            handler() {},
-        },
         searchQuery(newSearchKey) {
             if (!newSearchKey.trim()) {
                 this.fetchUser();
@@ -372,11 +393,26 @@ export default {
         },
     },
     computed: {
+        ...mapState({
+            users: (state) => state.users || [],
+            roles: (state) => state.roles || [],
+            permissions: (state) => state.permissions || [],
+            pagination: (state) => state.pagination || {},
+        }),
         loggedInUser() {
-            return this.user;
+            return this.user || {};
         },
     },
     methods: {
+        ...mapActions([
+            "fetchUser",
+            "search",
+            "filterByRole",
+            "filterByAll",
+        ]),
+        async search() {
+            await this.$store.dispatch("search", this.searchQuery);
+        },
         async sorting(order) {
             try {
                 if (order === "asc") {
@@ -387,83 +423,14 @@ export default {
                     this.fetchUser();
                 }
             } catch (e) {
-                console.log("Sorting error:", e);
+                console.error("Sorting error:", e);
             }
-        },
-        async filterByRoleNull(roleId = null) {
-            try {
-                const { data } = await api.post("roles/filter", {
-                    role_id: roleId,
-                });
-                this.users = data.users;
-                this.roles = data.roles;
-                this.fetchUser(1);
-            } catch (e) {
-                console.error("Error filtering users by role:", e);
-            }
-        },
-        async filterByRole(roleId) {
-            try {
-                const { data } = await api.post("/roles/filter", {
-                    role_id: roleId,
-                });
-                this.users = data.users;
-                this.roles = data.roles;
-            } catch (e) {
-                console.error("Error filtering users by role:", e);
-            }
-        },
-        async search() {
-            const search = {
-                key: this.searchQuery,
-            };
-            try {
-                const { data } = await api.post("/users/search", search);
-                this.users = data.users;
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        refreshView() {
-            this.refreshKey++;
         },
         hasPermissions(permission) {
-            if (!this.user || !this.user.permissions) {
+            if (!this.loggedInUser || !this.permissions) {
                 return false;
             }
-            return this.user.permissions.includes(permission);
-        },
-        async fetchUser(page = 1) {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found. Please log in.");
-                return;
-            }
-            try {
-                const { data } = await api.get(`/users?page=${page}`);
-                this.users = data.users.data;
-                this.roles = data.roles;
-
-                const role = this.roles.find(
-                    (role) => role.id === this.user.role_id
-                );
-                if (role) {
-                    const { data: permissionsData } = await api.get(
-                        `/roles/${role.id}/permissions`
-                    );
-                    this.user.permissions = permissionsData.permissions || [];
-                }
-                this.pagination = {
-                    current_page: data.users.current_page,
-                    last_page: data.users.last_page,
-                    total: data.users.total,
-                    per_page: data.users.per_page,
-                };
-
-                console.log("Users: ", data);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
+            return this.permissions.includes(permission);
         },
         async changeUserRole(userId, roleId) {
             try {
@@ -493,7 +460,6 @@ export default {
         },
         async deleteUser(userId) {
             if (this.user.id === userId) {
-                console.error("You cannot delete yourself.");
                 alert("You cannot delete yourself.");
                 return;
             }
@@ -510,7 +476,6 @@ export default {
         },
         async suspendUser(userId) {
             if (this.user.id === userId) {
-                console.error("You cannot suspend yourself.");
                 alert("You cannot suspend yourself.");
                 return;
             }
@@ -543,11 +508,11 @@ export default {
         },
         getBadgeClass(role_id) {
             const roleColorMapping = {
-                1: "bg-info",
-                2: "bg-success",
+                1: "bg-primary",
+                2: "bg-warning",
                 3: "bg-danger",
-                4: "bg-primary",
-                5: "bg-warning",
+                4: "bg-info",
+                5: "bg-success",
             };
             return roleColorMapping[role_id] || "bg-secondary";
         },
