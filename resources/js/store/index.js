@@ -109,7 +109,11 @@ export const store = createStore({
                 const { data } = await api.post("/users/search", {
                     key: searchQuery,
                 });
+                console.log("Users from search list:", data.users);
+                // console.log("Roles from search:", data.users.roles);
+
                 commit("setUsers", data.users);
+                // commit("setRoles", data.users.roles);
             } catch (error) {
                 console.error("Error searching users:", error);
             }

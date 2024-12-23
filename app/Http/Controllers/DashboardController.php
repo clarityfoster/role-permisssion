@@ -122,16 +122,20 @@ class DashboardController extends Controller
     public function search() {
         $searchQuery = request()->input('key');
         if($searchQuery) {
-            $users = User::where('name', 'LIKE', "%$searchQuery%")
+            $users = User::with('role')->where('name', 'LIKE', "%$searchQuery%")
                     ->orWhere('email', 'LIKE', "%$searchQuery%")
                     ->orWhere('address', 'LIKE', "%$searchQuery%")
                     ->orWhere('phone', 'LIKE', "%$searchQuery%")
+                    ->orWhereHas('role', function($query) use ($searchQuery) {
+                        $query->where('name', 'LIKE', "%$searchQuery%");
+                    })
                     ->get();
         } else {
             return;
         }
         return response()->json([
-            'users' => UserResource::collection($users),
+            'users' => $users,
+            // 'users' => UserResource::collection($users),
         ]);
     }
     public function filterByRole() {
