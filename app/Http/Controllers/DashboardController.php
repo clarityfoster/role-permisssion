@@ -135,7 +135,6 @@ class DashboardController extends Controller
         }
         return response()->json([
             'users' => $users,
-            // 'users' => UserResource::collection($users),
         ]);
     }
     public function filterByRole() {

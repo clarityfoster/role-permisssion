@@ -31,9 +31,6 @@ export const store = createStore({
         setUser(state, user) {
             state.user = user;
         },
-        resetPermissions(state) {
-            state.permissions = []; // Reset permissions when the user changes
-        },
     },
     getters: {
         hasPermissions: (state) => (permission) => {
@@ -41,11 +38,18 @@ export const store = createStore({
         },
     },
     actions: {
-        async fetchUser({ commit, state }) {
+        async fetchUser({ commit, state }, page = 1) {
             try {
-                const { data } = await api.get(`/users?page=1`); // You can use dynamic pagination if needed
+                const { data } = await api.get(`/users?page=${page}`);
+                console.log("All users: ", data.users.data);
                 commit("setUsers", data.users.data);
                 commit("setRoles", data.roles);
+                commit("setPagination", {
+                    current_page: data.users.current_page,
+                    last_page: data.users.last_page,
+                    total: data.users.total,
+                    per_page: data.users.per_page,
+                });
 
                 const role = state.roles.find(
                     (role) => role.id === state.user.role_id
@@ -54,26 +58,13 @@ export const store = createStore({
                     const { data: permissionsData } = await api.get(
                         `/roles/${role.id}/permissions`
                     );
+                    console.log("User Permissions:", permissionsData.permissions);
                     commit("setPermissions", permissionsData.permissions || []);
                 } else {
                     console.error("No matching role found for the user.");
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
-            }
-        },
-        async search({ commit }, searchQuery) {
-            try {
-                const { data } = await api.post("/users/search", {
-                    key: searchQuery,
-                });
-                console.log("Users from search list:", data.users);
-                // console.log("Roles from search:", data.users.roles);
-
-                commit("setUsers", data.users);
-                // commit("setRoles", data.users.roles);
-            } catch (error) {
-                console.error("Error searching users:", error);
             }
         },
         async filterByRole({ commit }, { roleId, page = 1 }) {
@@ -92,6 +83,17 @@ export const store = createStore({
                 });
             } catch (e) {
                 console.error("Error filtering users by role:", e);
+            }
+        },
+        async search({ commit }, searchQuery) {
+            try {
+                const { data } = await api.post("/users/search", {
+                    key: searchQuery,
+                });
+
+                commit("setUsers", data.users);
+            } catch (error) {
+                console.error("Error searching users:", error);
             }
         },
     },
