@@ -69,7 +69,7 @@
                                 <a
                                     href="#"
                                     class="dropdown-item"
-                                    @click.prevent="filterByAll()"
+                                    @click.prevent="fetchUser()"
                                 >
                                     All
                                 </a>
@@ -368,7 +368,7 @@
 <script>
 import api from "../api/axios.js";
 import Sidebar from "./Sidebar.vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapGetters } from "vuex";
 
 export default {
     components: {
@@ -393,6 +393,7 @@ export default {
         },
     },
     computed: {
+        ...mapGetters(['hasPermissions']),
         ...mapState({
             users: (state) => state.users || [],
             roles: (state) => state.roles || [],
@@ -408,7 +409,6 @@ export default {
             "fetchUser",
             "search",
             "filterByRole",
-            "filterByAll",
         ]),
         async search() {
             await this.$store.dispatch("search", this.searchQuery);
@@ -425,12 +425,6 @@ export default {
             } catch (e) {
                 console.error("Sorting error:", e);
             }
-        },
-        hasPermissions(permission) {
-            if (!this.loggedInUser || !this.permissions) {
-                return false;
-            }
-            return this.permissions.includes(permission);
         },
         async changeUserRole(userId, roleId) {
             try {
@@ -522,7 +516,7 @@ export default {
 
 <style lang="scss" scoped>
 .table-active {
-    background-color: #f8f9fa !important; /* Light blue for highlight */
+    background-color: #f8f9fa !important;
 }
 .table {
     border-radius: 15px;

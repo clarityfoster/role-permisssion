@@ -77,50 +77,54 @@
 
 <script>
 import api from "../api/axios.js";
+
 export default {
     name: "Login",
     data() {
-    return {
-        email: "",
-        password: "",
-        loginSuccess: "",
-        loginFail: "",
-        auth_user: JSON.parse(localStorage.getItem('user')) || null, // Initialize with existing user from localStorage
-    };
-},
-mounted() {
-    window.addEventListener('storage', this.syncUserData);
-},
-beforeDestroy() {
-    window.removeEventListener('storage', this.syncUserData);
-},
-methods: {
-    syncUserData() {
-        this.auth_user = JSON.parse(localStorage.getItem('user')) || null;
+        return {
+            email: "",
+            password: "",
+            loginSuccess: "",
+            loginFail: "",
+            auth_user: JSON.parse(localStorage.getItem('user')) || null,
+        };
     },
-    async login() {
-        try {
-            const { data } = await api.post("/login", {
-                email: this.email,
-                password: this.password,
-            });
+    mounted() {
+        window.addEventListener('storage', this.syncUserData);
+    },
+    beforeDestroy() {
+        window.removeEventListener('storage', this.syncUserData);
+    },
+    methods: {
+        syncUserData() {
+            this.auth_user = JSON.parse(localStorage.getItem('user')) || null;
+        },
+        async login() {
+            try {
+                const { data } = await api.post("/login", {
+                    email: this.email,
+                    password: this.password,
+                });
 
-            if (data.success) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
+                if (data.success) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
 
-                this.auth_user = data.user;
-                this.loginSuccess = "Login successful!";
-                this.loginFail = "";
+                    this.$store.commit("setUser", data.user);
+                    await this.$store.dispatch("fetchUser");
+
+                    this.loginSuccess = "Login successful!";
+                    this.loginFail = "";
+                }
+
+                this.$router.push("/dashboard");
+            } catch (error) {
+                this.loginFail =
+                    error.response?.data?.message || "Incorrect email or password!";
+                this.loginSuccess = "";
             }
-            this.$router.push("/dashboard");
-        } catch (error) {
-            this.loginFail =
-                error.response?.data?.message || "Incorrect email or password!";
-            this.successMessage = "";
-        }
+        },
     },
-},
 };
 </script>
 

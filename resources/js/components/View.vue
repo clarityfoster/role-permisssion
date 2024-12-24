@@ -122,7 +122,7 @@ export default {
                 const { data } = await api.get(`/users/${id}/view`);
                 this.user = data.user;
                 this.auth_user = data.auth_user;
-                console.log("Data from view page: ", data);
+                console.log('Auth user: ', this.auth_user);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
