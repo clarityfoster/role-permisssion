@@ -1,5 +1,5 @@
 ## Role Permission
-This project is a User Management System built using Vue.js, Vuex, and a backend API. The application provides features for user role management, and permissions handling.
+This project is a User Management System built using Laravel, Vue.js, Vuex, and a backend API. The application provides features for user role management, and permissions handling.
 
 ## Features
 - **User Management**:
