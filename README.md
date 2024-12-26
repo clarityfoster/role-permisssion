@@ -27,7 +27,7 @@ This project is a User Management System built using Vue.js, Vuex, and a backend
     
 ## Technologies Used
 - Laravel
-- Vue3, Vuex
+- Vue
 - MySQL(managed using phpMyAdmin)
 - HTML/CSS
 - Bootstrap
