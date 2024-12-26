@@ -12,7 +12,7 @@ This project is a User Management System built using Vue.js, Vuex, and a backend
   - Grant specific permissions to roles or users to control access to features.
 
 - **Suspend/Unsuspend Users**:
-  - Enable or disable user access with a single click.
+  - Enable user login.
 
 - **Pagination**:
   - Manage large datasets with paginated user listings.
@@ -21,8 +21,7 @@ This project is a User Management System built using Vue.js, Vuex, and a backend
 - Login to access the dashboard.
 - View the list of users with pagination.
 - Assign roles to users using the dropdown menu.
-- Suspend or unsuspend users with appropriate permissions.
-- Search for users using the search bar.
+- Suspend or unsuspend users with permissions.
 - Filter users by role.
     
 ## Technologies Used
