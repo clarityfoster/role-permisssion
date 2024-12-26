@@ -244,7 +244,8 @@
                                 aria-label="Basic outlined example"
                             >
                                 <button
-                                    v-if="hasPermissions('change-role')"
+                                    v-if="hasPermissions('change-role') &&
+                                    (loggedInUser.role_id === 3 || user.role_id !== 3)"
                                     type="button"
                                     class="btn btn-outline-info dropdown"
                                 >
@@ -277,7 +278,8 @@
                                     </ul>
                                 </button>
                                 <button
-                                    v-if="hasPermissions('user-update')"
+                                    v-if="hasPermissions('user-update') &&
+                                    (loggedInUser.role_id === 3 || user.role_id !== 3)"
                                     @click="editUser(user.id)"
                                     class="btn btn-outline-secondary"
                                 >
@@ -295,7 +297,8 @@
                         <td
                             v-if="
                                 hasPermissions('user-suspended') &&
-                                user.id !== loggedInUser.id
+                                (user.id !== loggedInUser.id) &&
+                                (loggedInUser.role_id === 3 || user.role_id !== 3)
                             "
                             class="text-muted"
                         >
@@ -317,7 +320,8 @@
                             </button>
                         </td>
                         <td
-                            v-if="hasPermissions('user-delete')"
+                            v-if="hasPermissions('user-delete') &&
+                                (loggedInUser.role_id === 3 || user.role_id !== 3)"
                             class="text-muted"
                         >
                             <button
@@ -445,8 +449,8 @@ export default {
                         permissions: updatedPermissions,
                     };
                     localStorage.setItem("user", JSON.stringify(this.user));
+                    this.$store.commit("setUser", this.user);
                 }
-
                 this.fetchUser();
             } catch (error) {
                 console.error("Error updating user role:", error);

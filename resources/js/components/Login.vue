@@ -111,7 +111,6 @@ export default {
                     localStorage.setItem("user", JSON.stringify(data.user));
 
                     this.$store.commit("setUser", data.user);
-                    await this.$store.dispatch("fetchUser");
 
                     this.loginSuccess = "Login successful!";
                     this.loginFail = "";

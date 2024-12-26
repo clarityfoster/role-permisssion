@@ -41,7 +41,6 @@ export const store = createStore({
         async fetchUser({ commit, state }, page = 1) {
             try {
                 const { data } = await api.get(`/users?page=${page}`);
-                console.log("All users: ", data.users.data);
                 commit("setUsers", data.users.data);
                 commit("setRoles", data.roles);
                 commit("setPagination", {
@@ -58,7 +57,6 @@ export const store = createStore({
                     const { data: permissionsData } = await api.get(
                         `/roles/${role.id}/permissions`
                     );
-                    console.log("User Permissions:", permissionsData.permissions);
                     commit("setPermissions", permissionsData.permissions || []);
                 } else {
                     console.error("No matching role found for the user.");
@@ -90,7 +88,9 @@ export const store = createStore({
                 const { data } = await api.post("/users/search", {
                     key: searchQuery,
                 });
-
+                if(data.length <= 0) {
+                    return false;
+                }
                 commit("setUsers", data.users);
             } catch (error) {
                 console.error("Error searching users:", error);

@@ -49,7 +49,7 @@
                         name="address"
                     />
                 </div>
-                <div class="mb-3" v-if="auth_user.role_id === 3">
+                <div class="mb-3" v-if="hasPermissions('change-role')">
                     <label for="role">Role</label>
                     <select
                         name="role_id"
@@ -75,6 +75,7 @@
 <script>
 import api from "../api/axios.js";
 import Sidebar from "./Sidebar.vue";
+import { mapGetters } from "vuex/dist/vuex.cjs.js";
 
 export default {
     components: {
@@ -101,6 +102,9 @@ export default {
         this.fetchRoles();
         this.fetchUsers();
         this.fetchAuthUser();
+    },
+    computed: {
+        ...mapGetters(['hasPermissions']),
     },
     methods: {
         async fetchAuthUser() {
