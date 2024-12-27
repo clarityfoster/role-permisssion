@@ -16,6 +16,9 @@ This project is a User Management System built using Laravel, Vue.js, Vuex, and 
 
 - **Pagination**:
   - Manage large datasets with paginated user listings.
+
+- **Restrict to same permissions users**:
+    - Allow users to edit their own roles but block editing roles of others with the same permissions.
     
 ## Usage
 - Login to access the dashboard.
