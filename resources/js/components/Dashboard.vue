@@ -37,10 +37,10 @@
                         style="cursor: pointer"
                     >
                         <span @click="view(user.id)" v-if="user">
-                            {{ user.name }}
+                            {{ auth_user.name }}
                         </span>
                         <small @click="view(user.id)" v-if="user">
-                            {{ user.email }}
+                            {{ auth_user.email }}
                         </small>
                     </div>
                 </div>
@@ -169,7 +169,7 @@
                     <tr v-for="user in users" :key="user.id">
                         <td
                             :class="
-                                user.id === loggedInUser.id
+                                user.id === auth_user.id
                                     ? 'text-dark'
                                     : 'text-secondary'
                             "
@@ -192,19 +192,17 @@
                         <td
                             class="fw-semibold"
                             :class="
-                                user.id === loggedInUser.id
+                                user.id === auth_user.id
                                     ? 'text-dark'
                                     : 'text-secondary'
                             "
                         >
                             {{ user.name }}
-                            <small v-if="user.id === loggedInUser.id"
-                                >(Me)</small
-                            >
+                            <small v-if="user.id === auth_user.id">(Me)</small>
                         </td>
                         <td
                             :class="
-                                user.id === loggedInUser.id
+                                user.id === auth_user.id
                                     ? 'text-dark'
                                     : 'text-secondary'
                             "
@@ -213,7 +211,7 @@
                         </td>
                         <td
                             :class="
-                                user.id === loggedInUser.id
+                                user.id === auth_user.id
                                     ? 'text-dark'
                                     : 'text-secondary'
                             "
@@ -222,7 +220,7 @@
                         </td>
                         <td
                             :class="
-                                user.id === loggedInUser.id
+                                user.id === auth_user.id
                                     ? 'text-dark'
                                     : 'text-secondary'
                             "
@@ -244,8 +242,11 @@
                                 aria-label="Basic outlined example"
                             >
                                 <button
-                                    v-if="hasPermissions('change-role') &&
-                                    (loggedInUser.role_id === 3 || user.role_id !== 3)"
+                                    v-if="
+                                        hasPermissions('change-role') &&
+                                        (auth_user.role_id === 3 ||
+                                            user.role_id !== 3)
+                                    "
                                     type="button"
                                     class="btn btn-outline-info dropdown"
                                 >
@@ -278,8 +279,23 @@
                                     </ul>
                                 </button>
                                 <button
-                                    v-if="hasPermissions('user-update') &&
-                                    (loggedInUser.role_id === 3 || user.role_id !== 3)"
+                                    v-if="
+                                        hasPermissions('user-update') &&
+                                        (auth_user.role_id === 3 || user.role_id !== 3) &&
+                                        (user.id === auth_user.id ||
+                                            !user.role ||
+                                            !auth_user.role ||
+                                            user.role.permissions.some(
+                                                (permission) =>
+                                                    permission.permissions ===
+                                                    'user-update'
+                                            ) !==
+                                                auth_user.role.permissions.some(
+                                                    (permission) =>
+                                                        permission.permissions ===
+                                                        'user-update'
+                                                ))
+                                    "
                                     @click="editUser(user.id)"
                                     class="btn btn-outline-secondary"
                                 >
@@ -297,8 +313,19 @@
                         <td
                             v-if="
                                 hasPermissions('user-suspended') &&
-                                (user.id !== loggedInUser.id) &&
-                                (loggedInUser.role_id === 3 || user.role_id !== 3)
+                                user.id !== auth_user.id &&
+                                (!user.role ||
+                                    !auth_user.role ||
+                                    user.role.permissions.some(
+                                        (permission) =>
+                                            permission.permissions ===
+                                            'user-suspended'
+                                    ) !==
+                                        auth_user.role.permissions.some(
+                                            (permission) =>
+                                                permission.permissions ===
+                                                'user-suspended'
+                                        ))
                             "
                             class="text-muted"
                         >
@@ -319,13 +346,29 @@
                                 Suspend
                             </button>
                         </td>
+                        <td v-else></td>
                         <td
-                            v-if="hasPermissions('user-delete') &&
-                                (loggedInUser.role_id === 3 || user.role_id !== 3)"
+                            v-if="
+                                hasPermissions('user-delete') &&
+                                (auth_user.role_id === 3 || user.role_id !== 3) &&
+                                (
+                                    !user.role ||
+                                    !auth_user.role ||
+                                    user.role.permissions.some(
+                                        (permission) =>
+                                            permission.permissions ===
+                                            'user-delete'
+                                    ) !==
+                                        auth_user.role.permissions.some(
+                                            (permission) =>
+                                                permission.permissions ===
+                                                'user-delete'
+                                        ))
+                            "
                             class="text-muted"
                         >
                             <button
-                                v-if="user.id !== loggedInUser.id"
+                                v-if="user.id !== auth_user.id"
                                 type="button"
                                 class="btn btn-danger"
                                 @click="deleteUser(user.id)"
@@ -337,7 +380,7 @@
                 </tbody>
             </table>
             <div
-               v-if="users.length === 0"
+                v-if="users.length === 0"
                 class="d-flex align-items-center justify-content-center"
                 style="height: 500px"
             >
@@ -384,10 +427,12 @@ export default {
             user: JSON.parse(localStorage.getItem("user")),
             userDeleteAlert: "",
             searchQuery: "",
+            auth_user: {},
         };
     },
     mounted() {
         this.fetchUser();
+        this.fetchAuthUser();
     },
     watch: {
         searchQuery(newSearchKey) {
@@ -397,25 +442,27 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['hasPermissions']),
+        ...mapGetters(["hasPermissions"]),
         ...mapState({
             users: (state) => state.users || [],
+            auth_user: (state) => state.auth_user || {},
             roles: (state) => state.roles || [],
             permissions: (state) => state.permissions || [],
             pagination: (state) => state.pagination || {},
         }),
-        loggedInUser() {
-            return this.user || {};
-        },
     },
     methods: {
-        ...mapActions([
-            "fetchUser",
-            "search",
-            "filterByRole",
-        ]),
+        ...mapActions(["fetchUser", "fetchAuthUser", "search", "filterByRole"]),
         async search() {
             await this.$store.dispatch("search", this.searchQuery);
+        },
+        async fetchAuthUser() {
+            try {
+                const { data } = await api.get("/users");
+                this.auth_user = data.auth_user;
+            } catch (error) {
+                console.error("Fetch Auth User Error: ", error);
+            }
         },
         async sorting(order) {
             try {

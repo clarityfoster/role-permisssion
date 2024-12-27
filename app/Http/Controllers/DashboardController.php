@@ -12,15 +12,14 @@ use App\Http\Resources\UserResource;
 class DashboardController extends Controller
 {
     public function dashboard() {
-        $user = Auth::user();
-        $users = User::with('role')->paginate(7);
+        $user = Auth::user()->load('role.permissions');
+        $users = User::with('role.permissions')->paginate(7);
         $roles = Role::all();
         $role_id = Role::pluck('id');
         $permissions = Permission::all();
-        $authUser = Auth::user();
         return response()->json([
             'users' => $users,
-            'user' => $user,
+            'auth_user' => $user,
             'roles' => $roles,
             'permissions' => $permissions,
             'role_id' => $role_id,

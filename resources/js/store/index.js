@@ -5,6 +5,7 @@ export const store = createStore({
     state: {
         user: JSON.parse(localStorage.getItem("user")) || null,
         permissions: [],
+        auth_user: {},
         users: [],
         roles: [],
         setFilterUsers: "",
@@ -18,6 +19,9 @@ export const store = createStore({
     mutations: {
         setUsers(state, users) {
             state.users = users;
+        },
+        setAuthUser(state, user) {
+            state.user = user;
         },
         setRoles(state, roles) {
             state.roles = roles;
@@ -41,6 +45,7 @@ export const store = createStore({
         async fetchUser({ commit, state }, page = 1) {
             try {
                 const { data } = await api.get(`/users?page=${page}`);
+                console.log('All Users: ', data.users.data);
                 commit("setUsers", data.users.data);
                 commit("setRoles", data.roles);
                 commit("setPagination", {
@@ -63,6 +68,15 @@ export const store = createStore({
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
+            }
+        },
+        async fetchAuthUser({commit}) {
+            try {
+                const {data} = await api.get('/user');
+                commit('setAuthUser', data);
+                console.log("Auth User: ", data);
+            } catch (error) {
+                console.error('Fetch Auth User Error: ', error);
             }
         },
         async filterByRole({ commit }, { roleId, page = 1 }) {

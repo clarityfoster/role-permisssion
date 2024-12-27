@@ -50,4 +50,7 @@ class User extends Authenticatable
     public function hasPermission($permission) {
         return $this->role->permissions->contains('permissions', $permission);
     }
+    public function permission() {
+        return $this->hasMany(Permission::class);
+    }
 }
